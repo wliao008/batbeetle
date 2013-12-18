@@ -20,7 +20,8 @@ namespace Driver
                 //    //Console.WriteLine("Item " + i);
                 //    //r.Set("key" + i.ToString(), Guid.NewGuid());
                 //}
-                r.Set("name", "weiliao2");
+                r.Set("name", "weiliao3");
+                r.Set("num", 10);
                 Console.WriteLine("setting name");
             }
             var now = DateTime.Now - before;

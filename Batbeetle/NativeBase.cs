@@ -32,10 +32,28 @@ namespace Batbeetle
 
         public void Set(string key, object value)
         {
-            this.SendCommand(
-                Commands.Set,
-                Encoding.UTF8.GetBytes(key),
-                Encoding.UTF8.GetBytes(value.ToString()));
+            this.Set(key, Encoding.UTF8.GetBytes(value.ToString()), null);
+        }
+
+        public void Set(string key, string value)
+        {
+            this.Set(key, Encoding.UTF8.GetBytes(value), null);
+        }
+
+        public void Set(string key, byte[] value, int? expireInSec = null)
+        {
+            List<byte[]> args = new List<byte[]>();
+            args.Add(Commands.Set);
+            args.Add(Encoding.UTF8.GetBytes(key));
+            args.Add(value);
+
+            if (expireInSec.HasValue)
+            {
+                args.Add(Commands.Ex);
+                args.Add(Encoding.UTF8.GetBytes(expireInSec.Value.ToString()));
+            }
+
+            this.SendCommand(args);
         }
 
         private void Connect()
