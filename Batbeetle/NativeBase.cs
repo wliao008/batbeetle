@@ -31,34 +31,10 @@ namespace Batbeetle
             buffers = new List<ArraySegment<byte>>();
         }
 
-        public void Ping()
+        public async Task Ping()
         {
             Command cmd = new Command(Commands.Ping);
-            var bytes = cmd.ToBytes();
-            if (this.Socket.Connected)
-            {
-                this.Socket.BeginSend(bytes, 0, bytes.Length, SocketFlags.None, (sent) =>
-                {
-                    Console.WriteLine("Ping sent");
-                    if (this.Socket.Connected)
-                    {
-                        var buffs = new byte[5];
-                        this.Socket.BeginReceive(buffs, 0, buffs.Length, SocketFlags.None, (received) =>
-                        {
-                            Console.WriteLine("Response received:");
-                            Console.WriteLine(Encoding.UTF8.GetString(buffs));
-                        }, null);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Can't received, not connected");
-                    }
-                }, null);
-            }
-            else
-            {
-                Console.WriteLine("Not connected");
-            }
+            await this.SendCommandAsync(cmd);
         }
 
         public void Set(string key, object value)
@@ -87,28 +63,41 @@ namespace Batbeetle
             this.SendCommand(args);
         }
 
-        private void Connect()
-        {
-            if (!this.Socket.Connected)
-            {
-                var mre = new ManualResetEvent(false);
-                IPAddress ip = IPAddress.Parse(this.Host);
-                IPEndPoint ep = new IPEndPoint(ip, this.Port);
-                this.Socket.BeginConnect(ep, (result) =>
-                {
-                    Console.WriteLine("Connected to {0}:{1}", this.Host, this.Port);
-                    mre.Set();
-                }, null);
-                Console.WriteLine("Waiting on connection..");
-                mre.WaitOne();
-            }
-        }
-
-        public Task ConnectAsync()
+        public Task Connect()
         {
             IPAddress ip = IPAddress.Parse(this.Host);
             IPEndPoint ep = new IPEndPoint(ip, this.Port);
-            var task = Task.Factory.FromAsync(this.Socket.BeginConnect, this.Socket.EndConnect, ep, null);
+            var task = Task.Factory.FromAsync(
+                this.Socket.BeginConnect, 
+                this.Socket.EndConnect, 
+                ep, 
+                null);
+            return task;
+        }
+
+        private Task SendCommandAsync(Command cmd)
+        {
+            var task = Task.Factory.StartNew(() =>
+            {
+                var bytes = cmd.ToBytes();
+                var len = bytes.Length;
+                this.Socket.Send(bytes);
+                Console.WriteLine("Command sent");
+            });
+
+            return task.ContinueWith((r) => this.ReceiveResponseAsync());
+        }
+
+        private Task ReceiveResponseAsync()
+        {
+            var task = Task.Factory.StartNew(() =>
+            {
+                var buffs = new byte[5];
+                this.Socket.Receive(buffs);
+                Console.WriteLine("Response:");
+                Console.WriteLine(Encoding.UTF8.GetString(buffs));
+            });
+
             return task;
         }
 
