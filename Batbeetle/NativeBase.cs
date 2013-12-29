@@ -33,7 +33,7 @@ namespace Batbeetle
 
         public async Task Ping()
         {
-            Command cmd = new Command(Commands.Ping);
+            Command cmd = new Command(Commands.Info);
             await this.SendCommandAsync(cmd);
         }
 
@@ -88,17 +88,33 @@ namespace Batbeetle
             return task.ContinueWith((r) => this.ReceiveResponseAsync());
         }
 
-        private Task ReceiveResponseAsync()
+        private async Task<Response> ReceiveResponseAsync()
         {
+            Response resp = new Response();
             var task = Task.Factory.StartNew(() =>
             {
-                var buffs = new byte[5];
+                var buffs = new byte[50];
                 this.Socket.Receive(buffs);
+                //parse the response
+                switch (buffs[0])
+                {
+                    case 0x2B://status
+                        resp.Reply = Replies.Status;
+                        break;
+                    case 0x2D://error
+                        break;
+                    case 0x3A://integer
+                        break;
+                    case 0x24://bulk
+                        break;
+                    case 0x2A://multibulk
+                        break;
+                }
                 Console.WriteLine("Response:");
                 Console.WriteLine(Encoding.UTF8.GetString(buffs));
             });
 
-            return task;
+            return resp;
         }
 
         /*
