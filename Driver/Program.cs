@@ -14,12 +14,12 @@ namespace Driver
     {
         static void Main(string[] args)
         {
-            DbEntities db = new DbEntities();
-            var consumers = db.Consumers.ToList();
-            var products = db.Products.ToList();
             var before = DateTime.Now;
-            var count = consumers.Count + products.Count;
-            //using (var r = new RedisClient("192.168.1.115"))
+            //DbEntities db = new DbEntities();
+            //var consumers = db.Consumers.ToList();
+            //var products = db.Products.ToList();
+            //var count = consumers.Count + products.Count;
+            //using (var r = new RedisClient("192.168.10.137"))
             //{
             //    //for (int i = 0; i < count; ++i)
             //    //{
@@ -31,21 +31,29 @@ namespace Driver
             //    Console.WriteLine("setting name");
             //}
 
-            using (var ms = new MemoryStream())
-            {
-                var formatter = new BinaryFormatter();
-                foreach (var c in consumers)
-                {
-                    //formatter.Serialize(ms, c);
-                    Serializer.Serialize(ms, c);
-                }
+            //using (var ms = new MemoryStream())
+            //{
+            //    var formatter = new BinaryFormatter();
+            //    foreach (var c in consumers)
+            //    {
+            //        //formatter.Serialize(ms, c);
+            //        Serializer.Serialize(ms, c);
+            //    }
 
-                foreach (var p in products)
-                    Serializer.Serialize(ms, p);
-            } 
-            var now = DateTime.Now - before;
-            Console.WriteLine("Redis (write): took {0} sec {1} ms to store {2} records, total {3} ms",
-                now.Seconds, now.Milliseconds, count, now.TotalMilliseconds);
+            //    foreach (var p in products)
+            //        Serializer.Serialize(ms, p);
+            //} 
+            var client = new RedisClient("192.168.10.137", 6380);
+            client.ConnectAsync()
+                .ContinueWith(t =>
+            {
+                Console.WriteLine("Main: Connected");
+                client.Ping();
+                var now = DateTime.Now - before;
+                Console.WriteLine("took {0} sec {1} ms, total {2} ms",
+                    now.Seconds, now.Milliseconds, now.TotalMilliseconds);
+
+            });
             Console.Read();
         }
     }

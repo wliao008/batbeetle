@@ -15,6 +15,7 @@ namespace Batbeetle
         public readonly int Port = 6379;
         public readonly byte[] Crlf = new byte[] { 0x0D, 0x0A };
         public Socket Socket { get; set; }
+        private byte[] buf = new byte[512];
         private IList<ArraySegment<byte>> buffers;
 
         public NativeBase()
@@ -28,6 +29,36 @@ namespace Batbeetle
             this.Port = port;
             this.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             buffers = new List<ArraySegment<byte>>();
+        }
+
+        public void Ping()
+        {
+            Command cmd = new Command(Commands.Ping);
+            var bytes = cmd.ToBytes();
+            if (this.Socket.Connected)
+            {
+                this.Socket.BeginSend(bytes, 0, bytes.Length, SocketFlags.None, (sent) =>
+                {
+                    Console.WriteLine("Ping sent");
+                    if (this.Socket.Connected)
+                    {
+                        var buffs = new byte[5];
+                        this.Socket.BeginReceive(buffs, 0, buffs.Length, SocketFlags.None, (received) =>
+                        {
+                            Console.WriteLine("Response received:");
+                            Console.WriteLine(Encoding.UTF8.GetString(buffs));
+                        }, null);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Can't received, not connected");
+                    }
+                }, null);
+            }
+            else
+            {
+                Console.WriteLine("Not connected");
+            }
         }
 
         public void Set(string key, object value)
@@ -71,6 +102,14 @@ namespace Batbeetle
                 Console.WriteLine("Waiting on connection..");
                 mre.WaitOne();
             }
+        }
+
+        public Task ConnectAsync()
+        {
+            IPAddress ip = IPAddress.Parse(this.Host);
+            IPEndPoint ep = new IPEndPoint(ip, this.Port);
+            var task = Task.Factory.FromAsync(this.Socket.BeginConnect, this.Socket.EndConnect, ep, null);
+            return task;
         }
 
         /*
