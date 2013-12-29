@@ -38,14 +38,24 @@ namespace Batbeetle
             await this.SendCommandAsync(cmd);
         }
 
+        public async Task Info()
+        {
+            Command cmd = new Command(Commands.Info);
+            await this.SendCommandAsync(cmd);
+        }
+
         public void Set(string key, object value)
         {
             this.Set(key, Encoding.UTF8.GetBytes(value.ToString()), null);
         }
 
-        public void Set(string key, string value)
+        public async Task Set(string key, string value)
         {
-            this.Set(key, Encoding.UTF8.GetBytes(value), null);
+            //this.Set(key, Encoding.UTF8.GetBytes(value), null);
+            Command cmd = new Command(Commands.Set);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(value);
+            await this.SendCommandAsync(cmd);
         }
 
         public void Set(string key, byte[] value, int? expireInSec = null)
@@ -78,20 +88,21 @@ namespace Batbeetle
 
         private Task SendCommandAsync(Command cmd)
         {
-            var task = Task.Factory.StartNew(() =>
-            {
-                var bytes = cmd.ToBytes();
-                var len = bytes.Length;
-                this.Socket.Send(bytes);
-                Console.WriteLine("Command sent");
-            });
+            var cmdBytes = cmd.ToBytes();
+            var task = Task.Factory.FromAsync<int>(
+                this.Socket.BeginSend(cmdBytes, 0, cmdBytes.Length, SocketFlags.None, null, null),
+                this.Socket.EndSend);
 
             return task.ContinueWith((r) => this.ReceiveResponseAsync());
         }
 
-        private async Task<Response> ReceiveResponseAsync()
+        private Task<Response> ReceiveResponseAsync()
         {
             Response resp = new Response();
+            //var task = Task.Factory.FromAsync<int>(
+            //    this.Socket.BeginReceive(buf, 0, buf.Length, SocketFlags.None, null, null),
+            //    this.Socket.EndReceive);
+
             var task = Task.Factory.StartNew(() =>
             {
                 Console.WriteLine("Response:\n");
@@ -126,9 +137,9 @@ namespace Batbeetle
                 resp.Data = str;
                 resp.ToArray();
                 Console.WriteLine(resp.Data);
+                return resp;
             });
-
-            return resp;
+            return task;
         }
 
         /*
