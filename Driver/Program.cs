@@ -43,7 +43,7 @@ namespace Driver
             //    foreach (var p in products)
             //        Serializer.Serialize(ms, p);
             //} 
-            using (var client = new RedisClient("192.168.10.137", 6380))
+            using (var client = new RedisClient("192.168.10.138", 6380))
             {
                 client.Connect()
                     .ContinueWith(t =>

@@ -9,6 +9,15 @@ namespace Batbeetle
     public class Response
     {
         public Replies Reply { get; set; }
+        public string Data { get; set; }
+
+        public void ToArray()
+        {
+            if (!string.IsNullOrEmpty(this.Data))
+            {
+                var data = this.Data.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            }
+        }
     }
 
     public enum Replies

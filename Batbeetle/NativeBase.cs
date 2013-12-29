@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -33,7 +34,7 @@ namespace Batbeetle
 
         public async Task Ping()
         {
-            Command cmd = new Command(Commands.Info);
+            Command cmd = new Command(Commands.Ping);
             await this.SendCommandAsync(cmd);
         }
 
@@ -93,25 +94,38 @@ namespace Batbeetle
             Response resp = new Response();
             var task = Task.Factory.StartNew(() =>
             {
-                var buffs = new byte[50];
-                this.Socket.Receive(buffs);
-                //parse the response
-                switch (buffs[0])
+                Console.WriteLine("Response:\n");
+                StringBuilder sb = new StringBuilder();
+                int byteRecd = 0;
+                int totalByteRecd = 0;
+
+                while (this.Socket.Available > 0)
                 {
-                    case 0x2B://status
+                    byteRecd = this.Socket.Receive(buf);
+                    //Console.Write(Encoding.UTF8.GetString(buf, 0, byteRecd));
+                    sb.Append(Encoding.UTF8.GetString(buf, 0, byteRecd));
+                    totalByteRecd += byteRecd;
+                }
+                Console.WriteLine("Bytes recd: " + totalByteRecd);
+                var str = sb.ToString();
+                //parse the response
+                switch (str[0])
+                {
+                    case '+'://status
                         resp.Reply = Replies.Status;
                         break;
-                    case 0x2D://error
+                    case '-'://error
                         break;
-                    case 0x3A://integer
+                    case ':'://integer
                         break;
-                    case 0x24://bulk
+                    case '$'://bulk
                         break;
-                    case 0x2A://multibulk
+                    case '*'://multibulk
                         break;
                 }
-                Console.WriteLine("Response:");
-                Console.WriteLine(Encoding.UTF8.GetString(buffs));
+                resp.Data = str;
+                resp.ToArray();
+                Console.WriteLine(resp.Data);
             });
 
             return resp;
