@@ -99,6 +99,7 @@ namespace Batbeetle
         private Task<Response> ReceiveResponseAsync()
         {
             Response resp = new Response();
+            StringBuilder sb = new StringBuilder();
             //var task = Task.Factory.FromAsync<int>(
             //    this.Socket.BeginReceive(buf, 0, buf.Length, SocketFlags.None, null, null),
             //    this.Socket.EndReceive);
@@ -106,7 +107,6 @@ namespace Batbeetle
             var task = Task.Factory.StartNew(() =>
             {
                 Console.WriteLine("Response:\n");
-                StringBuilder sb = new StringBuilder();
                 int byteRecd = 0;
                 int totalByteRecd = 0;
 
@@ -119,26 +119,31 @@ namespace Batbeetle
                 }
                 Console.WriteLine("Bytes recd: " + totalByteRecd);
                 var str = sb.ToString();
-                //parse the response
-                switch (str[0])
+                if (!string.IsNullOrEmpty(str))
                 {
-                    case '+'://status
-                        resp.Reply = Replies.Status;
-                        break;
-                    case '-'://error
-                        break;
-                    case ':'://integer
-                        break;
-                    case '$'://bulk
-                        break;
-                    case '*'://multibulk
-                        break;
+                    //parse the response
+                    switch (str[0])
+                    {
+                        case '+'://status
+                            resp.Reply = Replies.Status;
+                            break;
+                        case '-'://error
+                            break;
+                        case ':'://integer
+                            break;
+                        case '$'://bulk
+                            break;
+                        case '*'://multibulk
+                            break;
+                    }
+                    resp.Data = str;
+                    resp.ToArray();
+                    Console.WriteLine(resp.Data);
                 }
-                resp.Data = str;
-                resp.ToArray();
-                Console.WriteLine(resp.Data);
+
                 return resp;
             });
+
             return task;
         }
 
