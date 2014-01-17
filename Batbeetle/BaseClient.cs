@@ -80,7 +80,9 @@ namespace Batbeetle
                 cmd.ArgList.Add(Commands.Xx);
 
             this.SendCommand(cmd);
-            this.DevNull();
+            var resp = this.ParseResponse();
+            if(resp != null)
+                Console.WriteLine(Encoding.UTF8.GetString(resp));
         }
 
         public byte[] Get(byte[] key)
@@ -123,8 +125,8 @@ namespace Batbeetle
             int c;
             while ((c = bs.ReadByte()) != -1)
             {
-                if (c == '\n') break;
                 sb.Append((char)c);
+                if (c == '\n') break;
             }
             return sb.ToString();
         }
@@ -137,7 +139,11 @@ namespace Batbeetle
 
             switch (str[0])
             {
-                case '$':
+                case '+'://status
+                case '-'://error
+                    return Encoding.UTF8.GetBytes(str.Substring(1));
+                case '$'://bulk
+                    if (str == "$-1\r\n") return null;
                     int len = int.Parse(str.Substring(1));
                     var buf = new byte[len];
                     var bytesRecd = 0;
