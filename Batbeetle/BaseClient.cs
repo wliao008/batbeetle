@@ -46,17 +46,18 @@ namespace Batbeetle
             bs = new BufferedStream(new NetworkStream(this.Socket), BUFFERSIZE);
         }
 
-        public void Ping()
+        public byte[] Ping()
         {
             var cmd = new Command(Commands.Ping);
             this.SendCommand(cmd);
+            return this.ReadResponse();
         }
 
         public string[] Info()
         {
             var cmd = new Command(Commands.Info);
             this.SendCommand(cmd);
-            var resp = this.ParseResponse();
+            var resp = this.ReadResponse();
             var str = Encoding.UTF8.GetString(resp);
             var data = str.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             return data;
@@ -91,7 +92,7 @@ namespace Batbeetle
                 cmd.ArgList.Add(Commands.Xx);
 
             this.SendCommand(cmd);
-            var resp = this.ParseResponse();
+            var resp = this.ReadResponse();
             if(resp != null)
                 Console.WriteLine(Encoding.UTF8.GetString(resp));
         }
@@ -102,7 +103,7 @@ namespace Batbeetle
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
 
-            return this.ParseResponse();
+            return this.ReadResponse();
         }
 
         public void HMSet(byte[] key, byte[][] fieldKeys, byte[][] fieldValues)
@@ -115,7 +116,7 @@ namespace Batbeetle
                 cmd.ArgList.Add(fieldValues[i]);
             }
             this.SendCommand(cmd);
-            var resp = this.ParseResponse();
+            var resp = this.ReadResponse();
             if (resp != null)
                 Console.WriteLine(Encoding.UTF8.GetString(resp));
         }
@@ -125,7 +126,7 @@ namespace Batbeetle
             var cmd = new Command(Commands.HGetAll);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
-            var resp = this.ParseResponse();
+            var resp = this.ReadResponse();
             return resp;
             //var tmp = this.Socket.Receive(buf); //this.ParseResponse();
             //var str = Encoding.UTF8.GetString(buf, 0, tmp);
@@ -169,7 +170,7 @@ namespace Batbeetle
             return sb.ToString();
         }
 
-        private byte[] ParseResponse()
+        private byte[] ReadResponse()
         {
             var str = this.ReadLine();
             if (string.IsNullOrEmpty(str))
@@ -198,7 +199,7 @@ namespace Batbeetle
                     var totalLen = 0;
                     while (lines > 0)
                     {
-                        var bytes = ParseResponse();
+                        var bytes = ReadResponse();
                         if (bytes != null)
                         {
                             totalLen += bytes.Length;

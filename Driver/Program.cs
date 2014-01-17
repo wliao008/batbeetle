@@ -18,12 +18,15 @@ namespace Driver
             var before = DateTime.Now;
             using (var client = new RedisClient("127.0.0.1", 6379))
             {
-                Hashtable guids = new Hashtable();
-                for (int i = 0; i < 1000; i++)
-                {
-                    guids["name" + i] = Guid.NewGuid().ToString();
-                }
-                client.HMSet("guidtbl", guids);
+                var resp = client.Ping();
+                Console.WriteLine(resp.BytesToString());
+
+                //Hashtable guids = new Hashtable();
+                //for (int i = 0; i < 1000; i++)
+                //{
+                //    guids["name" + i] = Guid.NewGuid().ToString();
+                //}
+                //client.HMSet("guidtbl", guids);
 
                 //Hashtable tbl = client.HMGetAll("guidtbl");
                 //foreach (DictionaryEntry de in tbl)
