@@ -46,8 +46,9 @@ namespace Driver
             using (var client = new RedisClient("127.0.0.1", 6379))
             {
                 //client.Ping();
-                client.Set("Wei", "X", null, 10000, true, false);
-                //client.Get("Wei");
+                client.Set("test", "156");
+                var value = client.Get("test");
+                Console.WriteLine(value);
                 var now = DateTime.Now - before;
                 Console.WriteLine("took {0} sec {1} ms, total {2} ms",
                     now.Seconds, now.Milliseconds, now.TotalMilliseconds);

@@ -47,9 +47,10 @@ namespace Batbeetle
                 setIfExist);
         }
 
-        public void Get(string key)
+        public string Get(string key)
         {
-            base.Get(Encoding.UTF8.GetBytes(key));
+            var bytes = base.Get(Encoding.UTF8.GetBytes(key));
+            return Encoding.UTF8.GetString(bytes);
         }
     }
 }
