@@ -21,6 +21,9 @@ namespace Driver
                 Hashtable tbl = client.HMGetAll("mynewhash");
                 foreach (DictionaryEntry de in tbl)
                     Console.WriteLine("{0}: {1}", de.Key, de.Value);
+
+                var a = client.Get("a");
+                Console.WriteLine("a: " + a);
                 var now = DateTime.Now - before;
                 Console.WriteLine("took {0} sec {1} ms, total {2} ms",
                     now.Seconds, now.Milliseconds, now.TotalMilliseconds);

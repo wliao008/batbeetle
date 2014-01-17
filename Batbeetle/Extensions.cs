@@ -10,9 +10,19 @@ namespace Batbeetle
 {
     public static class Extensions
     {
-        public static Task ConnectTaskAsync(this Socket socket, EndPoint endpoint)
+        public static byte[] ToByte(this object obj)
         {
-            return Task.Factory.FromAsync(socket.BeginConnect, socket.EndConnect, endpoint, null);
+            return Encoding.UTF8.GetBytes(obj.ToString());
+        }
+
+        public static byte[] ToByte(this string str)
+        {
+            return Encoding.UTF8.GetBytes(str);
+        }
+
+        public static string BytesToString(this byte[] bytes)
+        {
+            return Encoding.UTF8.GetString(bytes);
         }
     }
 }
