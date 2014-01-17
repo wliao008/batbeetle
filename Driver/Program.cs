@@ -18,12 +18,9 @@ namespace Driver
             var before = DateTime.Now;
             using (var client = new RedisClient("127.0.0.1", 6379))
             {
-                Hashtable tbl = new Hashtable();
-                tbl["name"] = "Wei Liao";
-                tbl["age"] = 32;
-                tbl["url"] = "http://www.goo.com";
-                tbl["email"] = "Wei.Liao@liazon.com";
-                client.HMSet("mynewhash", tbl);
+                Hashtable tbl = client.HMGetAll("mynewhash");
+                foreach (DictionaryEntry de in tbl)
+                    Console.WriteLine("{0}: {1}", de.Key, de.Value);
                 var now = DateTime.Now - before;
                 Console.WriteLine("took {0} sec {1} ms, total {2} ms",
                     now.Seconds, now.Milliseconds, now.TotalMilliseconds);

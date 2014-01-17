@@ -17,5 +17,10 @@ namespace Batbeetle
         {
             return Encoding.UTF8.GetBytes(str);
         }
+
+        public static string BytesToString(this byte[] bytes)
+        {
+            return Encoding.UTF8.GetString(bytes);
+        }
     }
 }

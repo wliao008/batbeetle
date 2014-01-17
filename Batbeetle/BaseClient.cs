@@ -107,7 +107,7 @@ namespace Batbeetle
 
         public void HMSet(byte[] key, byte[][] fieldKeys, byte[][] fieldValues)
         {
-            var cmd = new Command(Commands.Hmset);
+            var cmd = new Command(Commands.HMSet);
             cmd.ArgList.Add(key);
             for (int i = 0; i < fieldKeys.Length; ++i)
             {
@@ -118,6 +118,18 @@ namespace Batbeetle
             var resp = this.ParseResponse();
             if (resp != null)
                 Console.WriteLine(Encoding.UTF8.GetString(resp));
+        }
+
+        public byte[] HMGetAll(byte[] key)
+        {
+            var cmd = new Command(Commands.HGetAll);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            var resp = this.ParseResponse();
+            return resp;
+            //var tmp = this.Socket.Receive(buf); //this.ParseResponse();
+            //var str = Encoding.UTF8.GetString(buf, 0, tmp);
+            //return str.ToByte();
         }
 
         public void Dispose()
@@ -170,7 +182,7 @@ namespace Batbeetle
                     return Encoding.UTF8.GetBytes(str.Substring(1));
                 case '$'://bulk
                     if (str == "$-1\r\n") return null;
-                    int len = int.Parse(str.Substring(1));
+                    int len = int.Parse(str.Substring(1)) + 2;
                     var buf = new byte[len];
                     var bytesRecd = 0;
                     while (bytesRecd < len)
@@ -180,9 +192,32 @@ namespace Batbeetle
                     }
 
                     return buf;
+                case '*'://multi bulk
+                    var lines = int.Parse(str.Substring(1));
+                    List<byte[]> listbytes = new List<byte[]>();
+                    var totalLen = 0;
+                    while (lines > 0)
+                    {
+                        var bytes = ParseResponse();
+                        if (bytes != null)
+                        {
+                            totalLen += bytes.Length;
+                            listbytes.Add(bytes);
+                        }
+                        lines--;
+                    }
+
+                    byte[] sum = new byte[totalLen];
+                    int idx = 0;
+                    listbytes.ForEach(x =>
+                    {
+                        x.CopyTo(sum, idx);
+                        idx += x.Length;
+                    });
+                    return sum;
             }
 
-            return null;
+            return str.ToByte();
         }
 
         private void DevNull()

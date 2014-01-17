@@ -96,5 +96,16 @@ namespace Batbeetle
 
             base.HMSet(key.ToByte(), keys, vals);
         }
+
+        public Hashtable HMGetAll(string key)
+        {
+            var data = base.HMGetAll(key.ToByte());
+            var str = data.BytesToString();
+            var sc = str.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            Hashtable tbl = new Hashtable();
+            for (int i = 0; i < sc.Length; i += 2)
+                tbl[sc[i]] = sc[i + 1];
+            return tbl;
+        }
     }
 }
