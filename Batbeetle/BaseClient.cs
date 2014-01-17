@@ -10,40 +10,104 @@ using System.Threading.Tasks;
 
 namespace Batbeetle
 {
-    public abstract class NativeBase : IDisposable
+    public abstract class BaseClient : IDisposable
     {        
         public readonly string Host = "127.0.0.1";
         public readonly int Port = 6379;
         public readonly byte[] Crlf = new byte[] { 0x0D, 0x0A };
         public Socket Socket { get; set; }
+        private const int BUFFERSIZE = 8192;
         private byte[] buf = new byte[512];
-        private IList<ArraySegment<byte>> buffers;
+        private BufferedStream bs;
 
-        public NativeBase()
+        public BaseClient()
             : this("127.0.0.1")
         {
         }
 
-        public NativeBase(string host, int port = 6379)
+        public BaseClient(string host, int port = 6379)
         {
             this.Host = host;
             this.Port = port;
+        }
+
+        public void Connect()
+        {
             this.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            buffers = new List<ArraySegment<byte>>();
+            this.Socket.NoDelay = true;
+            IPAddress ip = IPAddress.Parse(this.Host);
+            IPEndPoint ep = new IPEndPoint(ip, this.Port);
+            this.Socket.Connect(ep);
+
+            if (!this.Socket.Connected)
+                Dispose();
+
+            bs = new BufferedStream(new NetworkStream(this.Socket), BUFFERSIZE);
         }
 
-        public async Task Ping()
+        public void Ping()
         {
-            Command cmd = new Command(Commands.Ping);
-            await this.SendCommandAsync(cmd);
+            var cmd = new Command(Commands.Ping);
+            this.SendCommand(cmd);
         }
 
-        public async Task Info()
+        public void Set(byte[] key, byte[] value)
         {
-            Command cmd = new Command(Commands.Info);
-            await this.SendCommandAsync(cmd);
+            var cmd = new Command(Commands.Set);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(value);
+            this.SendCommand(cmd);
         }
 
+        public void Set(byte[] key, byte[] value, byte[] ex, byte[] px, bool nx, bool xx)
+        {
+            var cmd = new Command(Commands.Set);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(value);
+            if (ex != null && ex[0] != 0x30)
+            {
+                cmd.ArgList.Add(Commands.Ex);
+                cmd.ArgList.Add(ex);
+            }
+
+            if (px != null && px[0] != 0x30)
+            {
+                cmd.ArgList.Add(Commands.Px);
+                cmd.ArgList.Add(px);
+            }
+
+            if (nx)
+                cmd.ArgList.Add(Commands.Nx);
+
+            if (xx)
+                cmd.ArgList.Add(Commands.Xx);
+
+            this.SendCommand(cmd);
+        }
+
+        public void Get(byte[] key)
+        {
+            var cmd = new Command(Commands.Get);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+        }
+
+        private void SendCommand(Command cmd)
+        {
+            if (this.Socket == null)
+                Connect();
+
+            Console.WriteLine("Sending " + cmd.ToString());
+            var bytes = cmd.ToBytes();
+            this.Socket.Send(bytes);
+
+            var sb = new StringBuilder();
+            int byteRecd = this.Socket.Receive(bytes);
+            sb.Append(Encoding.UTF8.GetString(bytes, 0, byteRecd));
+            Console.WriteLine("\nRESPONSE: " + sb.ToString());
+        }
+
+        /*
         public void Set(string key, object value)
         {
             this.Set(key, Encoding.UTF8.GetBytes(value.ToString()), null);
@@ -71,10 +135,9 @@ namespace Batbeetle
                 args.Add(Encoding.UTF8.GetBytes(expireInSec.Value.ToString()));
             }
 
-            this.SendCommand(args);
-        }
+        }*/
 
-        public Task Connect()
+        public Task Connect2()
         {
             IPAddress ip = IPAddress.Parse(this.Host);
             IPEndPoint ep = new IPEndPoint(ip, this.Port);
@@ -176,36 +239,6 @@ namespace Batbeetle
             });
         }
         */
-
-        private void SendCommand(List<byte[]> cmds)
-        {
-            this.SendCommand(cmds.ToArray());
-        }
-
-        private void SendCommand(params byte[][] args)
-        {
-            this.Write2Buffer(this.BuildCmdBytes(CmdPrefix.NumArgs, args.Length));
-            foreach (var arg in args)
-            {
-                if (arg == null) continue;
-                this.Write2Buffer(this.BuildCmdBytes(CmdPrefix.NumBytes, arg.Length));
-                this.Write2Buffer(arg);
-                this.Write2Buffer(Crlf);
-            }
-
-            if (!this.Socket.Connected)
-                Connect();
-
-            this.Socket.BeginSend(buffers, SocketFlags.None, (result) =>
-            {
-                Console.WriteLine("Command sent");
-            }, null);
-        }
-
-        private void Write2Buffer(byte[] bytes)
-        {
-            buffers.Add(new ArraySegment<byte>(bytes, 0, bytes.Length));
-        }
 
         /// <summary>
         /// Format the command bytes according to redis protoco spec

@@ -9,5 +9,8 @@
 
         //args for the Set command
         public static readonly byte[] Ex = new byte[] { 0x45, 0x58 };
+        public static readonly byte[] Px = new byte[] { 0x50, 0x58 };
+        public static readonly byte[] Nx = new byte[] { 0x4E, 0x58 };
+        public static readonly byte[] Xx = new byte[] { 0x58, 0x58 };
     }
 }

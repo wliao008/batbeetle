@@ -19,25 +19,24 @@ $<number of bytes of argument N> CR LF
         public readonly byte[] Crlf = new byte[] { 0x0D, 0x0A };
         public int NumArgs { get; set; }
         public byte[] Cmd { get; set; }
-        public List<string> ArgList { get; set; }
+        public List<byte[]> ArgList { get; set; }
         public Command(byte[] cmd)
         {
             this.Cmd = cmd;
-            this.NumArgs = 1;
-            this.ArgList = new List<string>();
+            this.ArgList = new List<byte[]>();
         }
 
         public byte[] ToBytes()
         {
             var bytes = new List<byte>();
             //number of arguments
-            this.NumArgs += this.ArgList.Count;
+            this.NumArgs = this.ArgList.Count + 1;
             bytes.Add(0x2A);
-            bytes.AddRange(Encoding.ASCII.GetBytes(this.NumArgs.ToString()));
+            bytes.AddRange(Encoding.UTF8.GetBytes(this.NumArgs.ToString()));
             bytes.AddRange(Crlf);
             //command length
             bytes.Add(0x24);
-            bytes.AddRange(Encoding.ASCII.GetBytes(this.Cmd.Length.ToString()));
+            bytes.AddRange(Encoding.UTF8.GetBytes(this.Cmd.Length.ToString()));
             bytes.AddRange(Crlf);
             //command byte
             bytes.AddRange(this.Cmd);
@@ -46,13 +45,38 @@ $<number of bytes of argument N> CR LF
             this.ArgList.ForEach(x =>
             {
                 bytes.Add(0x24);
-                bytes.AddRange(Encoding.ASCII.GetBytes(x.Length.ToString()));
+                bytes.AddRange(Encoding.UTF8.GetBytes(x.Length.ToString()));
                 bytes.AddRange(Crlf);
-                bytes.AddRange(Encoding.ASCII.GetBytes(x));
+                bytes.AddRange(x);
                 bytes.AddRange(Crlf);
             });
             
             return bytes.ToArray();
+        }
+
+        private byte[] IntToBytes(int num)
+        {
+            byte[] bytes = BitConverter.GetBytes(num);
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
+            return bytes;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            var bytes = this.ToBytes();
+            foreach (var b in bytes)
+            {
+                if (b == '\r')
+                    sb.Append("\\r");
+                if (b == '\n')
+                    sb.Append("\\n");
+                else
+                    sb.Append((char)b);
+            }
+
+            return sb.ToString();
         }
     }
 }

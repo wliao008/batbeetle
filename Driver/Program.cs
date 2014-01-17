@@ -43,21 +43,14 @@ namespace Driver
             //    foreach (var p in products)
             //        Serializer.Serialize(ms, p);
             //} 
-            using (var client = new RedisClient("192.168.1.115", 6378))
+            using (var client = new RedisClient("127.0.0.1", 6379))
             {
-                client.Connect()
-                    .ContinueWith(t =>
-                {
-                    Console.WriteLine("redis connected");
-                    var task = client.Set("twemproxy", "Yeah!");
-                    task.Wait();
-                    //var task2 = client.Info();
-                    //task2.Wait();
-                    var now = DateTime.Now - before;
-                    Console.WriteLine("took {0} sec {1} ms, total {2} ms",
-                        now.Seconds, now.Milliseconds, now.TotalMilliseconds);
-
-                });
+                //client.Ping();
+                client.Set("Wei", "X", null, 10000, true, false);
+                //client.Get("Wei");
+                var now = DateTime.Now - before;
+                Console.WriteLine("took {0} sec {1} ms, total {2} ms",
+                    now.Seconds, now.Milliseconds, now.TotalMilliseconds);
             }
 
             Console.Read();
