@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -49,6 +50,16 @@ namespace Batbeetle
         {
             var cmd = new Command(Commands.Ping);
             this.SendCommand(cmd);
+        }
+
+        public string[] Info()
+        {
+            var cmd = new Command(Commands.Info);
+            this.SendCommand(cmd);
+            var resp = this.ParseResponse();
+            var str = Encoding.UTF8.GetString(resp);
+            var data = str.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            return data;
         }
 
         public void Set(byte[] key, byte[] value)
