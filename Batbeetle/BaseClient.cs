@@ -105,13 +105,19 @@ namespace Batbeetle
             return this.ParseResponse();
         }
 
-        private void SendCommand(Command cmd)
+        public void HMSet(byte[] key, byte[][] fieldKeys, byte[][] fieldValues)
         {
-            if (this.Socket == null)
-                Connect();
-
-            var bytes = cmd.ToBytes();
-            this.Socket.Send(bytes);
+            var cmd = new Command(Commands.Hmset);
+            cmd.ArgList.Add(key);
+            for (int i = 0; i < fieldKeys.Length; ++i)
+            {
+                cmd.ArgList.Add(fieldKeys[i]);
+                cmd.ArgList.Add(fieldValues[i]);
+            }
+            this.SendCommand(cmd);
+            var resp = this.ParseResponse();
+            if (resp != null)
+                Console.WriteLine(Encoding.UTF8.GetString(resp));
         }
 
         public void Dispose()
@@ -128,6 +134,15 @@ namespace Batbeetle
             {
                 Console.WriteLine(ex.Message);
             }
+        }
+
+        private void SendCommand(Command cmd)
+        {
+            if (this.Socket == null)
+                Connect();
+
+            var bytes = cmd.ToBytes();
+            this.Socket.Send(bytes);
         }
 
         private string ReadLine()

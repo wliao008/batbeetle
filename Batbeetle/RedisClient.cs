@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -51,6 +52,49 @@ namespace Batbeetle
         {
             var bytes = base.Get(Encoding.UTF8.GetBytes(key));
             return Encoding.UTF8.GetString(bytes);
+        }
+
+        public void HMSet(string key)
+        {
+            var fieldKeys = new List<string>();
+            var fieldValues = new List<string>();
+            fieldKeys.Add("field1");
+            fieldKeys.Add("field2");
+            fieldKeys.Add("field3");
+
+            fieldValues.Add("value1");
+            fieldValues.Add("value2");
+            fieldValues.Add("value3");
+
+            var byteKeys = new byte[3][];
+            var byteValues = new byte[3][];
+
+            for (int i = 0; i < 3; ++i)
+            {
+                byteKeys[i] = Encoding.UTF8.GetBytes(fieldKeys[i]);
+                byteValues[i] = Encoding.UTF8.GetBytes(fieldValues[i]);
+            }
+
+            base.HMSet(
+                Encoding.UTF8.GetBytes(key),
+                byteKeys,
+                byteValues);
+        }
+
+        public void HMSet(string key, Hashtable hash)
+        {
+            var len = hash.Count;
+            var keys = new byte[len][];
+            var vals = new byte[len][];
+            int i = 0;
+            foreach(DictionaryEntry de in hash)
+            {
+                keys[i] = de.Key.ToByte();
+                vals[i] = de.Value.ToByte();
+                i++;
+            }
+
+            base.HMSet(key.ToByte(), keys, vals);
         }
     }
 }
