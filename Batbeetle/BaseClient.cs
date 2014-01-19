@@ -133,6 +133,7 @@ namespace Batbeetle
             //return str.ToByte();
         }
 
+        #region Keys
         public byte[] Del(byte[] key)
         {
             var cmd = new Command(Commands.Del);
@@ -141,6 +142,17 @@ namespace Batbeetle
             var resp = this.ReadResponse();
             return resp;
         }
+
+        public byte[] Expire(byte[] key, byte[] seconds)
+        {
+            var cmd = new Command(Commands.Expire);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(seconds);
+            this.SendCommand(cmd);
+            var resp = this.ReadResponse();
+            return resp;
+        }
+        #endregion
 
         public void Dispose()
         {

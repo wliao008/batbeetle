@@ -18,10 +18,10 @@ namespace Driver
             var before = DateTime.Now;
             using (var client = new RedisClient("127.0.0.1", 6379))
             {
-                client.Set("Wei", "Liao");
-                var str = client.Get("Wei");
-                Console.WriteLine("Response: " + str);
-                var resp = client.Del("Wei".ToByte());
+                client.Set("key1", "val1");
+                client.Set("key2", "val2");
+                var resp = client.Expire("key1".ToByte(), "10".ToByte());
+
                 Console.WriteLine("Response: " + resp.BytesToString());
 
                 //Hashtable guids = new Hashtable();
