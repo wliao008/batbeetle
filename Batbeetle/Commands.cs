@@ -8,6 +8,7 @@
         public static readonly byte[] Get = new byte[] { 0x47, 0x45, 0x54 };
         public static readonly byte[] HMSet = new byte[] { 0x48, 0x4D, 0x53, 0x45, 0x54 };
         public static readonly byte[] HGetAll = new byte[] { 0x48, 0x47, 0x45, 0x54, 0x41, 0x4C, 0x4C };
+        public static readonly byte[] Del = new byte[] { 0x44, 0x45, 0x4C };
 
 
         //args for the Set command

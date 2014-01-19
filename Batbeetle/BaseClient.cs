@@ -133,6 +133,15 @@ namespace Batbeetle
             //return str.ToByte();
         }
 
+        public byte[] Del(byte[] key)
+        {
+            var cmd = new Command(Commands.Del);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            var resp = this.ReadResponse();
+            return resp;
+        }
+
         public void Dispose()
         {
             try
@@ -181,6 +190,8 @@ namespace Batbeetle
                 case '+'://status
                 case '-'://error
                     return Encoding.UTF8.GetBytes(str.Substring(1));
+                case ':'://integer
+                    return str.Substring(1).ToByte();
                 case '$'://bulk
                     if (str == "$-1\r\n") return null;
                     int len = int.Parse(str.Substring(1)) + 2;
