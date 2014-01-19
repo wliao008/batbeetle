@@ -152,6 +152,15 @@ namespace Batbeetle
             var resp = this.ReadResponse();
             return resp;
         }
+
+        public byte[] Dump(byte[] key)
+        {
+            var cmd = new Command(Commands.Dump);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            var resp = this.ReadResponse();
+            return resp;
+        }
         #endregion
 
         public void Dispose()

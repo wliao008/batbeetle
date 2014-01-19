@@ -8,9 +8,11 @@
         public static readonly byte[] Get = new byte[] { 0x47, 0x45, 0x54 };
         public static readonly byte[] HMSet = new byte[] { 0x48, 0x4D, 0x53, 0x45, 0x54 };
         public static readonly byte[] HGetAll = new byte[] { 0x48, 0x47, 0x45, 0x54, 0x41, 0x4C, 0x4C };
+
+        //keys
         public static readonly byte[] Del = new byte[] { 0x44, 0x45, 0x4C };
         public static readonly byte[] Expire = new byte[] { 0x45, 0x58, 0x50, 0x49, 0x52, 0x45 };
-
+        public static readonly byte[] Dump = new byte[] { 0x44, 0x55, 0x4d, 0x50 };
 
         //args for the Set command
         public static readonly byte[] Ex = new byte[] { 0x45, 0x58 };

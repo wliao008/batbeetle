@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Batbeetle;
 using ProtoBuf;
+using System.Diagnostics;
 
 namespace Driver
 {
@@ -18,10 +19,10 @@ namespace Driver
             var before = DateTime.Now;
             using (var client = new RedisClient("127.0.0.1", 6379))
             {
-                client.Set("key1", "val1");
+                client.Set("key1", "10");
                 client.Set("key2", "val2");
-                var resp = client.Expire("key1".ToByte(), "10".ToByte());
-
+                var resp = client.Dump("key1".ToByte());
+                var str = resp.BytesToString();
                 Console.WriteLine("Response: " + resp.BytesToString());
 
                 //Hashtable guids = new Hashtable();
