@@ -40,14 +40,7 @@ namespace Driver
                 //client.Set("mytest3b", "val3b");
                 //trans.Commit();
                 //GetAndDisplay(client, "myguids");
-                client.Set("mykey".ToByte(), "This ia a string".ToByte());
-                var resp = client.GetRange("mykey".ToByte(), "0".ToByte(), "3".ToByte());
-                Console.WriteLine(resp.BytesToString());
-                resp = client.GetRange("mykey".ToByte(), "-3".ToByte(), "-1".ToByte());
-                Console.WriteLine(resp.BytesToString());
-                resp = client.GetRange("mykey".ToByte(), "0".ToByte(), "-1".ToByte());
-                Console.WriteLine(resp.BytesToString());
-                resp = client.GetRange("mykey".ToByte(), "10".ToByte(), "100".ToByte());
+                var resp = client.GetSet("meme".ToByte(), "0".ToByte());
                 Console.WriteLine(resp.BytesToString());
 
                 var now = DateTime.Now - before;
