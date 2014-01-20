@@ -64,6 +64,28 @@ namespace Batbeetle
             return data;
         }
 
+        #region Strings
+        public int Append(byte[] key, byte[] value)
+        {
+            var cmd = new Command(Commands.Append);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(value);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse();
+        }
+
+        public int Bitcount(byte[] key, byte[] start, byte[] end)
+        {
+            var cmd = new Command(Commands.Bitcount);
+            cmd.ArgList.Add(key);
+            if (start != null)
+                cmd.ArgList.Add(start);
+            if (end != null)
+                cmd.ArgList.Add(end);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse();
+        }
+
         public string Set(byte[] key, byte[] value)
         {
             return this.Set(key, value, null, null, false, false);
@@ -103,7 +125,9 @@ namespace Batbeetle
             this.SendCommand(cmd);
             return this.ReadBulkResponse();
         }
+        #endregion
 
+        #region Hash
         public string HMSet(byte[] key, byte[][] fieldKeys, byte[][] fieldValues)
         {
             var cmd = new Command(Commands.HMSet);
@@ -125,6 +149,7 @@ namespace Batbeetle
             var resp = this.ReadMultibulkResponse();
             return resp;
         }
+        #endregion
 
         #region Keys
         public int Del(byte[] key)

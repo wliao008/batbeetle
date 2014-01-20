@@ -26,9 +26,13 @@ namespace Driver
                 //}
                 //client.HMSet("myguids", guids);
 
-                Hashtable tbl = client.HMGetAll("myguids");
-                foreach (DictionaryEntry de in tbl)
-                    Console.WriteLine("{0}: {1}", de.Key, de.Value);
+                //Hashtable tbl = client.HMGetAll("myguids");
+                //foreach (DictionaryEntry de in tbl)
+                //    Console.WriteLine("{0}: {1}", de.Key, de.Value);
+
+                client.Set("mykey".ToByte(), "foobar".ToByte());
+                var resp = client.Bitcount("mykey".ToByte(), "1".ToByte(), "1".ToByte());
+                Console.WriteLine(resp);
 
                 var now = DateTime.Now - before;
                 Console.WriteLine("took {0} sec {1} ms, total {2} ms",
