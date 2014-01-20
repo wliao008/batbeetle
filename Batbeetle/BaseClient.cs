@@ -246,7 +246,7 @@ namespace Batbeetle
             }
         }
 
-        private void SendCommand(Command cmd)
+        protected internal void SendCommand(Command cmd)
         {
             if (this.Socket == null)
                 Connect();
@@ -273,6 +273,7 @@ namespace Batbeetle
             var str = this.ReadLine();
             if (string.IsNullOrEmpty(str))
                 throw new Exception("Response is empty");
+            Console.WriteLine("ReadStringResponse: " + str);
             return str.Substring(1);
         }
 
@@ -288,16 +289,27 @@ namespace Batbeetle
         {
             var str = this.ReadLine();
             if (str == "$-1\r\n") return null;
-            int len = int.Parse(str.Substring(1)) + 2;
-            var tmp = new byte[len];
-            var bytesRecd = 0;
-            while (bytesRecd < len)
+            int len = 0;
+            int.TryParse(str.Substring(1), out len);
+            if (len > 0)
             {
-                int rcd = bs.Read(tmp, bytesRecd, len - bytesRecd);
-                bytesRecd += rcd;
+                len += 2;
+                var tmp = new byte[len];
+                var bytesRecd = 0;
+                while (bytesRecd < len)
+                {
+                    int rcd = bs.Read(tmp, bytesRecd, len - bytesRecd);
+                    bytesRecd += rcd;
+                }
+                return tmp;
             }
-
-            return tmp;
+            else
+            {
+                //this bulk response could be a result of a transaction, so the
+                //response is delayed and came in a bulk, that is different
+                //than the usual bulk reply.
+                return str.ToByte();
+            }
         }
 
         private byte[] ReadMultibulkResponse()
