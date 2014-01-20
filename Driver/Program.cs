@@ -34,8 +34,8 @@ namespace Driver
                 //var resp = client.Bitcount("mykey".ToByte(), "1".ToByte(), "1".ToByte());
                 //Console.WriteLine(resp);
                 var trans = new RedisTransaction(client);
-                client.Set("test1", "val1");
-                client.Set("test2", "val2");
+                client.Set("test1a", "val1");
+                client.Set("test2a", "val2");
                 trans.Commit();
 
                 var now = DateTime.Now - before;

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Batbeetle
 {
     public abstract class BaseClient : IDisposable
-    {        
+    {
         public readonly string Host = "127.0.0.1";
         public readonly int Port = 6379;
         public readonly byte[] Crlf = new byte[] { 0x0D, 0x0A };
