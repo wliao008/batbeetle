@@ -30,9 +30,13 @@ namespace Driver
                 //foreach (DictionaryEntry de in tbl)
                 //    Console.WriteLine("{0}: {1}", de.Key, de.Value);
 
-                client.Set("mykey".ToByte(), "foobar".ToByte());
-                var resp = client.Bitcount("mykey".ToByte(), "1".ToByte(), "1".ToByte());
-                Console.WriteLine(resp);
+                //client.Set("mykey".ToByte(), "foobar".ToByte());
+                //var resp = client.Bitcount("mykey".ToByte(), "1".ToByte(), "1".ToByte());
+                //Console.WriteLine(resp);
+                var trans = new RedisTransaction(client);
+                client.Set("test1", "val1");
+                client.Set("test2", "val2");
+                trans.Commit();
 
                 var now = DateTime.Now - before;
                 Console.WriteLine("took {0} sec {1} ms, total {2} ms",

@@ -178,6 +178,46 @@ namespace Batbeetle
         }
         #endregion
 
+        #region Transaction
+        public string Multi()
+        {
+            var cmd = new Command(Commands.Multi);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+
+        public byte[] Exec()
+        {
+            var cmd = new Command(Commands.Exec);
+            this.SendCommand(cmd);
+            return this.ReadMultibulkResponse();
+        }
+
+        public string Discard()
+        {
+            var cmd = new Command(Commands.Discard);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+
+        public string Watch(params byte[][] keys)
+        {
+            var cmd = new Command(Commands.Watch);
+            foreach (var key in keys)
+                cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+
+        public string Unwatch()
+        {
+            var cmd = new Command(Commands.Unwatch);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+
+        #endregion
+
         public void Dispose()
         {
             this.Dispose(true);
