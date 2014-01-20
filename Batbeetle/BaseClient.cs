@@ -46,29 +46,29 @@ namespace Batbeetle
             bs = new BufferedStream(new NetworkStream(this.Socket), BUFFERSIZE);
         }
 
-        public byte[] Ping()
+        public string Ping()
         {
             var cmd = new Command(Commands.Ping);
             this.SendCommand(cmd);
-            return this.ReadResponse();
+            return this.ReadStringResponse();
         }
 
         public string[] Info()
         {
             var cmd = new Command(Commands.Info);
             this.SendCommand(cmd);
-            var resp = this.ReadResponse();
+            var resp = this.ReadBulkResponse();
             var str = Encoding.UTF8.GetString(resp);
             var data = str.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             return data;
         }
 
-        public void Set(byte[] key, byte[] value)
+        public string Set(byte[] key, byte[] value)
         {
-            this.Set(key, value, null, null, false, false);
+            return this.Set(key, value, null, null, false, false);
         }
 
-        public void Set(byte[] key, byte[] value, byte[] ex, byte[] px, bool nx, bool xx)
+        public string Set(byte[] key, byte[] value, byte[] ex, byte[] px, bool nx, bool xx)
         {
             var cmd = new Command(Commands.Set);
             cmd.ArgList.Add(key);
@@ -92,9 +92,7 @@ namespace Batbeetle
                 cmd.ArgList.Add(Commands.Xx);
 
             this.SendCommand(cmd);
-            var resp = this.ReadResponse();
-            if(resp != null)
-                Console.WriteLine(Encoding.UTF8.GetString(resp));
+            return this.ReadStringResponse();
         }
 
         public byte[] Get(byte[] key)
@@ -102,11 +100,10 @@ namespace Batbeetle
             var cmd = new Command(Commands.Get);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
-
-            return this.ReadResponse();
+            return this.ReadBulkResponse();
         }
 
-        public void HMSet(byte[] key, byte[][] fieldKeys, byte[][] fieldValues)
+        public string HMSet(byte[] key, byte[][] fieldKeys, byte[][] fieldValues)
         {
             var cmd = new Command(Commands.HMSet);
             cmd.ArgList.Add(key);
@@ -116,9 +113,7 @@ namespace Batbeetle
                 cmd.ArgList.Add(fieldValues[i]);
             }
             this.SendCommand(cmd);
-            var resp = this.ReadResponse();
-            if (resp != null)
-                Console.WriteLine(Encoding.UTF8.GetString(resp));
+            return this.ReadStringResponse();
         }
 
         public byte[] HMGetAll(byte[] key)
@@ -126,40 +121,34 @@ namespace Batbeetle
             var cmd = new Command(Commands.HGetAll);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
-            var resp = this.ReadResponse();
+            var resp = this.ReadMultibulkResponse();
             return resp;
-            //var tmp = this.Socket.Receive(buf); //this.ParseResponse();
-            //var str = Encoding.UTF8.GetString(buf, 0, tmp);
-            //return str.ToByte();
         }
 
         #region Keys
-        public byte[] Del(byte[] key)
+        public int Del(byte[] key)
         {
             var cmd = new Command(Commands.Del);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
-            var resp = this.ReadResponse();
-            return resp;
+            return this.ReadIntResponse();
         }
 
-        public byte[] Expire(byte[] key, byte[] seconds)
+        public int Expire(byte[] key, byte[] seconds)
         {
             var cmd = new Command(Commands.Expire);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(seconds);
             this.SendCommand(cmd);
-            var resp = this.ReadResponse();
-            return resp;
+            return this.ReadIntResponse();
         }
 
-        public byte[] Dump(byte[] key)
+        public string Dump(byte[] key)
         {
             var cmd = new Command(Commands.Dump);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
-            var resp = this.ReadResponse();
-            return resp;
+            return this.ReadStringResponse();
         }
         #endregion
 
@@ -188,6 +177,7 @@ namespace Batbeetle
             this.Socket.Send(bytes);
         }
 
+        #region Parsing response
         private string ReadLine()
         {
             var sb = new StringBuilder();
@@ -200,6 +190,65 @@ namespace Batbeetle
             return sb.ToString();
         }
 
+        private string ReadStringResponse()
+        {
+            var str = this.ReadLine();
+            if (string.IsNullOrEmpty(str))
+                throw new Exception("Response is empty");
+            return str.Substring(1);
+        }
+
+        private int ReadIntResponse()
+        {
+            var resp = this.ReadStringResponse();
+            int ret = 0;
+            int.TryParse(resp, out ret);
+            return ret;
+        }
+
+        private byte[] ReadBulkResponse()
+        {
+            var str = this.ReadLine();
+            if (str == "$-1\r\n") return null;
+            int len = int.Parse(str.Substring(1)) + 2;
+            var tmp = new byte[len];
+            var bytesRecd = 0;
+            while (bytesRecd < len)
+            {
+                int rcd = bs.Read(tmp, bytesRecd, len - bytesRecd);
+                bytesRecd += rcd;
+            }
+
+            return tmp;
+        }
+
+        private byte[] ReadMultibulkResponse()
+        {
+            var lines = this.ReadIntResponse();
+            List<byte[]> listbytes = new List<byte[]>();
+            var totalLen = 0;
+            while (lines > 0)
+            {
+                var bytes = this.ReadBulkResponse();
+                if (bytes != null)
+                {
+                    totalLen += bytes.Length;
+                    listbytes.Add(bytes);
+                }
+                lines--;
+            }
+
+            byte[] sum = new byte[totalLen];
+            int idx = 0;
+            listbytes.ForEach(x =>
+            {
+                x.CopyTo(sum, idx);
+                idx += x.Length;
+            });
+            return sum;
+        }
+
+        [Obsolete]
         private byte[] ReadResponse()
         {
             var str = this.ReadLine();
@@ -252,10 +301,6 @@ namespace Batbeetle
 
             return str.ToByte();
         }
-
-        private void DevNull()
-        {
-            this.Socket.Receive(buf);
-        }
+        #endregion
     }
 }
