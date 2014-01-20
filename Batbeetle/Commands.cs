@@ -35,6 +35,9 @@
         public static readonly byte[] Expire = new byte[] { 0x45, 0x58, 0x50, 0x49, 0x52, 0x45 };
         public static readonly byte[] Dump = new byte[] { 0x44, 0x55, 0x4d, 0x50 };
 
+        //server
+        public static readonly byte[] FlushAll = new byte[] { 0x46, 0x4C, 0x55, 0x53, 0x48, 0x41, 0x4C, 0x4C };
+
         //args for the Set command
         public static readonly byte[] Ex = new byte[] { 0x45, 0x58 };
         public static readonly byte[] Px = new byte[] { 0x50, 0x58 };

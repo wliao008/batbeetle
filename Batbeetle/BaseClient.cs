@@ -246,6 +246,13 @@ namespace Batbeetle
         }
         #endregion
 
+        public string FlushAll()
+        {
+            var cmd = new Command(Commands.FlushAll);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+
         #region Transaction
         public string Multi()
         {
