@@ -20,6 +20,7 @@ namespace Batbeetle
         private const int BUFFERSIZE = 8192;
         private byte[] buf = new byte[512];
         private BufferedStream bs;
+        private bool disposed;
 
         public BaseClient()
             : this("127.0.0.1")
@@ -154,17 +155,29 @@ namespace Batbeetle
 
         public void Dispose()
         {
-            try
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            // For thread safety, use a lock around these  
+            // operations, as well as in methods that use the resource. 
+            if (!disposed)
             {
-                if (this.Socket != null && this.Socket.Connected)
+                if (disposing)
                 {
-                    this.Socket.Close();
-                    this.Socket.Dispose();
+                    if (this.Socket != null)
+                    {
+                        this.Socket.Dispose();
+                        Console.WriteLine("Object disposed.");
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
+
+                this.Socket = null;
+
+                // Indicate that the instance has been disposed.
+                disposed = true;
             }
         }
 
