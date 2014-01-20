@@ -33,12 +33,22 @@ namespace Driver
                 //client.Set("mykey".ToByte(), "foobar".ToByte());
                 //var resp = client.Bitcount("mykey".ToByte(), "1".ToByte(), "1".ToByte());
                 //Console.WriteLine(resp);
-                var trans = new RedisTransaction(client);
+                //var trans = new RedisTransaction(client);
                 //trans.AddCommandToQueue(c => c.Set("mytest1a", "val1a"));
                 //trans.AddCommandToQueue(c => c.Set("mytest2a", "val2a"));
-                client.Set("mytest3a", "val3a");
-                client.Set("mytest3b", "val3b");
-                trans.Commit();
+                //client.Set("mytest3a", "val3a");
+                //client.Set("mytest3b", "val3b");
+                //trans.Commit();
+                //GetAndDisplay(client, "myguids");
+                client.Set("mykey".ToByte(), "This ia a string".ToByte());
+                var resp = client.GetRange("mykey".ToByte(), "0".ToByte(), "3".ToByte());
+                Console.WriteLine(resp.BytesToString());
+                resp = client.GetRange("mykey".ToByte(), "-3".ToByte(), "-1".ToByte());
+                Console.WriteLine(resp.BytesToString());
+                resp = client.GetRange("mykey".ToByte(), "0".ToByte(), "-1".ToByte());
+                Console.WriteLine(resp.BytesToString());
+                resp = client.GetRange("mykey".ToByte(), "10".ToByte(), "100".ToByte());
+                Console.WriteLine(resp.BytesToString());
 
                 var now = DateTime.Now - before;
                 Console.WriteLine("took {0} sec {1} ms, total {2} ms",
@@ -46,6 +56,15 @@ namespace Driver
             }
 
             Console.Read();
+        }
+
+        static void GetAndDisplay(RedisClient client, string key)
+        {
+            var data = client.Get(key);
+            if (data != null)
+                Console.WriteLine(data);
+            else
+                Console.WriteLine("NULL");
         }
     }
 }

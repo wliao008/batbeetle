@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Batbeetle
 {
@@ -51,6 +47,7 @@ namespace Batbeetle
         public string Get(string key)
         {
             var bytes = base.Get(Encoding.UTF8.GetBytes(key));
+            if (bytes == null) return null;
             return Encoding.UTF8.GetString(bytes);
         }
 

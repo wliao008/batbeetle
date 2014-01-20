@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Batbeetle
 {
@@ -86,9 +82,63 @@ namespace Batbeetle
             return this.ReadIntResponse();
         }
 
+        public int Decr(byte[] key)
+        {
+            var cmd = new Command(Commands.Decr);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse();
+        }
+
+        public int DecrBy(byte[] key, byte[] decrement)
+        {
+            var cmd = new Command(Commands.DecrBy);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(decrement);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse();
+        }
+
         public string Set(byte[] key, byte[] value)
         {
             return this.Set(key, value, null, null, false, false);
+        }
+
+        public byte[] Get(byte[] key)
+        {
+            var cmd = new Command(Commands.Get);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public int GetBit(byte[] key, byte[] offset)
+        {
+            var cmd = new Command(Commands.GetBit);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(offset);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse();
+        }
+
+        public byte[] GetRange(byte[] key, byte[] start, byte[] end)
+        {
+            var cmd = new Command(Commands.GetRange);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(start);
+            cmd.ArgList.Add(end);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public int SetBit(byte[] key, byte[] offset, byte[] value)
+        {
+            var cmd = new Command(Commands.SetBit);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(offset);
+            cmd.ArgList.Add(value);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse();
         }
 
         public string Set(byte[] key, byte[] value, byte[] ex, byte[] px, bool nx, bool xx)
@@ -96,13 +146,13 @@ namespace Batbeetle
             var cmd = new Command(Commands.Set);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(value);
-            if (ex != null && ex[0] != 0x30)
+            if (ex != null)
             {
                 cmd.ArgList.Add(Commands.Ex);
                 cmd.ArgList.Add(ex);
             }
 
-            if (px != null && px[0] != 0x30)
+            if (px != null)
             {
                 cmd.ArgList.Add(Commands.Px);
                 cmd.ArgList.Add(px);
@@ -116,14 +166,6 @@ namespace Batbeetle
 
             this.SendCommand(cmd);
             return this.ReadStringResponse();
-        }
-
-        public byte[] Get(byte[] key)
-        {
-            var cmd = new Command(Commands.Get);
-            cmd.ArgList.Add(key);
-            this.SendCommand(cmd);
-            return this.ReadBulkResponse();
         }
         #endregion
 
@@ -289,6 +331,12 @@ namespace Batbeetle
         {
             var str = this.ReadLine();
             if (str == "$-1\r\n") return null;
+            if (str[0] == '-')
+            {
+                HandlError(str);
+                return null;
+            }
+
             int len = 0;
             int.TryParse(str.Substring(1), out len);
             if (len > 0)
@@ -338,58 +386,9 @@ namespace Batbeetle
             return sum;
         }
 
-        [Obsolete]
-        private byte[] ReadResponse()
+        private void HandlError(string error)
         {
-            var str = this.ReadLine();
-            if (string.IsNullOrEmpty(str))
-                throw new Exception("Response is empty");
-
-            switch (str[0])
-            {
-                case '+'://status
-                case '-'://error
-                    return Encoding.UTF8.GetBytes(str.Substring(1));
-                case ':'://integer
-                    return str.Substring(1).ToByte();
-                case '$'://bulk
-                    if (str == "$-1\r\n") return null;
-                    int len = int.Parse(str.Substring(1)) + 2;
-                    var buf = new byte[len];
-                    var bytesRecd = 0;
-                    while (bytesRecd < len)
-                    {
-                        int rcd = bs.Read(buf, bytesRecd, len - bytesRecd);
-                        bytesRecd += rcd;
-                    }
-
-                    return buf;
-                case '*'://multi bulk
-                    var lines = int.Parse(str.Substring(1));
-                    List<byte[]> listbytes = new List<byte[]>();
-                    var totalLen = 0;
-                    while (lines > 0)
-                    {
-                        var bytes = ReadResponse();
-                        if (bytes != null)
-                        {
-                            totalLen += bytes.Length;
-                            listbytes.Add(bytes);
-                        }
-                        lines--;
-                    }
-
-                    byte[] sum = new byte[totalLen];
-                    int idx = 0;
-                    listbytes.ForEach(x =>
-                    {
-                        x.CopyTo(sum, idx);
-                        idx += x.Length;
-                    });
-                    return sum;
-            }
-
-            return str.ToByte();
+            //log the error
         }
         #endregion
     }
