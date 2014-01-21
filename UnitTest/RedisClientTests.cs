@@ -1,6 +1,7 @@
 ﻿using System;
 using Batbeetle;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections;
 
 namespace UnitTest
 {
@@ -102,13 +103,82 @@ namespace UnitTest
         }
 
         [TestMethod]
-        public void Decr_NonIntParsableKey_ReturnError()
+        public void Decr_Non64bitIntParsableKey_ReturnError()
         {
             using (var client = new RedisClient(Host))
             {
                 //limits to 64bit signed int.
                 client.Set("mykey", "234293482390480948029348230948");
                 var result = client.Decr("mykey".ToByte());
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void DecrBy_ExistingKey_DecremenNumbertBySpecified()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                client.Set("mykey", "10");
+                var result = client.DecrBy("mykey".ToByte(), "5".ToByte());
+                Assert.AreEqual(5, result);
+            }
+        }
+
+        [TestMethod]
+        public void DecrBy_NonExistingKey_ReturnMinusSpecified()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                //set nonExistingKey to 0, then perform the operation
+                var result = client.DecrBy("nonExistingKey".ToByte(), "5".ToByte());
+                Assert.AreEqual(-5, result);
+            }
+        }
+
+        [TestMethod]
+        public void DecrBy_Non64bitIntParsableKey_ReturnError()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                //limits to 64bit signed int.
+                client.Set("mykey", "234293482390480948029348230948");
+                var result = client.DecrBy("mykey".ToByte(), "5".ToByte());
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void Get_ExistingStringKey_ReturnValue()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                client.Set("mykey", "value");
+                var result = client.Get("mykey");
+                Assert.AreEqual("value\r\n", result);
+            }
+        }
+
+        [TestMethod]
+        public void Get_NonExistingKey_ReturnNull()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                var result = client.Get("nonExistingKey");
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void Get_NonStringKey_ReturnNull()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                Hashtable tbl = new Hashtable();
+                tbl["name"] = "test";
+                tbl["age"] = 1;
+                client.HMSet("mykey", tbl);
+                var result = client.Get("mykey");
                 Assert.IsNull(result);
             }
         }
