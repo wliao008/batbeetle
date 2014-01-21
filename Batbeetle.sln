@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Batbeetle", "Batbeetle\Batbeetle.csproj", "{C1025355-19B0-4C03-96FB-B6CF394E271D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Driver", "Driver\Driver.csproj", "{86D99961-4372-45C8-92B9-B67A8BE8EFBE}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{17F5D8E0-BF59-4E4E-AE87-A4110C17817B}"
 EndProject
 Global
@@ -17,10 +15,6 @@ Global
 		{C1025355-19B0-4C03-96FB-B6CF394E271D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1025355-19B0-4C03-96FB-B6CF394E271D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1025355-19B0-4C03-96FB-B6CF394E271D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{86D99961-4372-45C8-92B9-B67A8BE8EFBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{86D99961-4372-45C8-92B9-B67A8BE8EFBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{86D99961-4372-45C8-92B9-B67A8BE8EFBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{86D99961-4372-45C8-92B9-B67A8BE8EFBE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{17F5D8E0-BF59-4E4E-AE87-A4110C17817B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{17F5D8E0-BF59-4E4E-AE87-A4110C17817B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17F5D8E0-BF59-4E4E-AE87-A4110C17817B}.Release|Any CPU.ActiveCfg = Release|Any CPU
