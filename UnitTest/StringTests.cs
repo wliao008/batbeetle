@@ -1,28 +1,21 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Batbeetle;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections;
 
 namespace UnitTest
 {
     [TestClass]
-    public class RedisClientTests
+    public class StringTests : TestBase
     {
-        public readonly string Host = "127.0.0.1";
-
-        [TestInitialize]
-        public void Init()
-        {
-            using (var client = new RedisClient(Host))
-            {
-                client.FlushAll();
-            }
-        }
-
         [TestMethod]
         public void Append_IfKeyExistAndIsString_AppendValueAtEnd()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 client.Set("existingKey", "Hello");
                 client.Append("existingKey".ToByte(), " World".ToByte());
@@ -34,7 +27,7 @@ namespace UnitTest
         [TestMethod]
         public void Append_IfKeyNotExist_CreateWithValue()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 client.Append("nonExistingKey".ToByte(), "Hello".ToByte());
                 client.Append("nonExistingKey".ToByte(), " World".ToByte());
@@ -46,7 +39,7 @@ namespace UnitTest
         [TestMethod]
         public void BitCount_IfString_ReturnNumOfBitsSetTo1()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 client.Set("mykey", "foobar");
                 var result = client.BitCount("mykey".ToByte(), null, null);
@@ -60,7 +53,7 @@ namespace UnitTest
         [TestMethod]
         public void BitCount_StartEnd_ReturnNumOfBitsSetTo1()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 client.Set("mykey", "foobar");
                 var result = client.BitCount("mykey".ToByte(), "0".ToByte(), "0".ToByte());
@@ -73,7 +66,7 @@ namespace UnitTest
         [TestMethod]
         public void BitCount_NonExistingKey_ReturnZero()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 var result = client.BitCount("nonExistingKey".ToByte(), null, null);
                 Assert.AreEqual(0, result);
@@ -83,7 +76,7 @@ namespace UnitTest
         [TestMethod]
         public void Decr_ExistingKey_DecremenNumbertBy1()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 client.Set("mykey", "10");
                 var result = client.Decr("mykey".ToByte());
@@ -94,7 +87,7 @@ namespace UnitTest
         [TestMethod]
         public void Decr_NonExistingKey_ReturnMinusOne()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 //set nonExistingKey to 0, then perform the operation
                 var result = client.Decr("nonExistingKey".ToByte());
@@ -105,7 +98,7 @@ namespace UnitTest
         [TestMethod]
         public void Decr_Non64bitIntParsableKey_ReturnError()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 //limits to 64bit signed int.
                 client.Set("mykey", "234293482390480948029348230948");
@@ -117,7 +110,7 @@ namespace UnitTest
         [TestMethod]
         public void DecrBy_ExistingKey_DecremenNumbertBySpecified()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 client.Set("mykey", "10");
                 var result = client.DecrBy("mykey".ToByte(), "5".ToByte());
@@ -128,7 +121,7 @@ namespace UnitTest
         [TestMethod]
         public void DecrBy_NonExistingKey_ReturnMinusSpecified()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 //set nonExistingKey to 0, then perform the operation
                 var result = client.DecrBy("nonExistingKey".ToByte(), "5".ToByte());
@@ -139,7 +132,7 @@ namespace UnitTest
         [TestMethod]
         public void DecrBy_Non64bitIntParsableKey_ReturnError()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 //limits to 64bit signed int.
                 client.Set("mykey", "234293482390480948029348230948");
@@ -151,7 +144,7 @@ namespace UnitTest
         [TestMethod]
         public void Get_ExistingStringKey_ReturnValue()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 client.Set("mykey", "value");
                 var result = client.Get("mykey");
@@ -162,7 +155,7 @@ namespace UnitTest
         [TestMethod]
         public void Get_NonExistingKey_ReturnNull()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 var result = client.Get("nonExistingKey");
                 Assert.IsNull(result);
@@ -172,7 +165,7 @@ namespace UnitTest
         [TestMethod]
         public void Get_NonStringKey_ReturnNull()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 Hashtable tbl = new Hashtable();
                 tbl["name"] = "test";
@@ -186,7 +179,7 @@ namespace UnitTest
         [TestMethod]
         public void GetBit_ExistingStringKey_ReturnBitAtSpecifiedOffset()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 client.SetBit("mykey".ToByte(), "7".ToByte(), "1".ToByte());
                 var result = client.GetBit("mykey".ToByte(), "0".ToByte());
@@ -201,7 +194,7 @@ namespace UnitTest
         [TestMethod]
         public void GetBit_ExistingStringKeyWrongOffset_ReturnZero()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 client.SetBit("mykey".ToByte(), "7".ToByte(), "1".ToByte());
                 var result = client.GetBit("mykey".ToByte(), "100".ToByte());
@@ -212,7 +205,7 @@ namespace UnitTest
         [TestMethod]
         public void GetBit_NonExistingStringKey_ReturnZero()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 var result = client.GetBit("nonExistingKey".ToByte(), "1".ToByte());
                 Assert.AreEqual(0, result);
@@ -222,7 +215,7 @@ namespace UnitTest
         [TestMethod]
         public void GetRange_ValidStringKey_ReturnSubstring()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 client.Set("mykey", "This is a string");
                 var result = client.GetRange("mykey".ToByte(), "0".ToByte(), "3".ToByte());
@@ -239,7 +232,7 @@ namespace UnitTest
         [TestMethod]
         public void GetRange_NonExistingStringKey_ReturnEmptyString()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 var result = client.GetRange("nonExistingKey".ToByte(), "0".ToByte(), "-1".ToByte());
                 Assert.AreEqual("\r\n", result.BytesToString());
@@ -249,7 +242,7 @@ namespace UnitTest
         [TestMethod]
         public void GetRange_OnWrongData_ReturnError()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 Hashtable tbl = new Hashtable();
                 tbl["name"] = "test";
@@ -263,7 +256,7 @@ namespace UnitTest
         [TestMethod]
         public void GetSet_ValidParams_SetThenGetTheValueStoredAtKey()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 client.Incr("mycounter".ToByte()); //1
                 var result = client.GetSet("mycounter".ToByte(), "0".ToByte());
@@ -276,7 +269,7 @@ namespace UnitTest
         [TestMethod]
         public void GetSet_InValidParams_ReturnNil()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 var result = client.GetSet("nonExistingKey".ToByte(), "0".ToByte());
                 Assert.IsNull(result);
@@ -286,7 +279,7 @@ namespace UnitTest
         [TestMethod]
         public void GetSet_NonStringDataType_ReturnNil()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 Hashtable tbl = new Hashtable();
                 tbl["name"] = "test";
@@ -300,7 +293,7 @@ namespace UnitTest
         [TestMethod]
         public void Incr_ExistingKey_IncremenNumbertBy1()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 client.Set("mykey", "10");
                 var result = client.Incr("mykey".ToByte());
@@ -311,7 +304,7 @@ namespace UnitTest
         [TestMethod]
         public void Incr_NonExistingKey_ReturnOne()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 //set nonExistingKey to 0, then perform the operation
                 var result = client.Incr("nonExistingKey".ToByte());
@@ -322,7 +315,7 @@ namespace UnitTest
         [TestMethod]
         public void Incr_Non64bitIntParsableKey_ReturnError()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 //limits to 64bit signed int.
                 client.Set("mykey", "234293482390480948029348230948");
@@ -334,7 +327,7 @@ namespace UnitTest
         [TestMethod]
         public void IncrBy_ExistingKey_IncremenNumbertBySpecified()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 client.Set("mykey", "10");
                 var result = client.IncrBy("mykey".ToByte(), "5".ToByte());
@@ -345,7 +338,7 @@ namespace UnitTest
         [TestMethod]
         public void IncrBy_NonExistingKey_ReturnSpecified()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 //set nonExistingKey to 0, then perform the operation
                 var result = client.IncrBy("nonExistingKey".ToByte(), "5".ToByte());
@@ -356,7 +349,7 @@ namespace UnitTest
         [TestMethod]
         public void IncrBy_Non64bitIntParsableKey_ReturnNil()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 //limits to 64bit signed int.
                 client.Set("mykey", "234293482390480948029348230948");
@@ -368,7 +361,7 @@ namespace UnitTest
         [TestMethod]
         public void IncrByFloat_ExistingKey_IncremenNumbertBySpecified()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 client.Set("mykey", "10.50");
                 var result = client.IncrByFloat("mykey".ToByte(), "0.1".ToByte());
@@ -379,7 +372,7 @@ namespace UnitTest
         [TestMethod]
         public void IncrByFloat_ExistingKey_IncremenNumbertBySpecified2()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 client.Set("mykey", "5.0e3");
                 var result = client.IncrByFloat("mykey".ToByte(), "2.0e2".ToByte());
@@ -390,7 +383,7 @@ namespace UnitTest
         [TestMethod]
         public void IncrByFloat_NonExistingKey_ReturnSpecified()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 //set nonExistingKey to 0, then perform the operation
                 var result = client.IncrByFloat("nonExistingKey".ToByte(), "0.25".ToByte());
@@ -401,7 +394,7 @@ namespace UnitTest
         [TestMethod]
         public void IncrByFloat_WrongDataType_ReturnNil()
         {
-            using (var client = new RedisClient(Host))
+            using (var client = new RedisClient(this.Host))
             {
                 Hashtable tbl = new Hashtable();
                 tbl["name"] = "test";
