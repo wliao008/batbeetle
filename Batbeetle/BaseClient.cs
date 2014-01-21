@@ -188,16 +188,6 @@ namespace Batbeetle
             return this.ReadIntResponse().Value;
         }
 
-        public int SetBit(byte[] key, byte[] offset, byte[] value)
-        {
-            var cmd = new Command(Commands.SetBit);
-            cmd.ArgList.Add(key);
-            cmd.ArgList.Add(offset);
-            cmd.ArgList.Add(value);
-            this.SendCommand(cmd);
-            return this.ReadIntResponse().Value;
-        }
-
         public string Set(byte[] key, byte[] value, byte[] ex, byte[] px, bool nx, bool xx)
         {
             var cmd = new Command(Commands.Set);
@@ -223,6 +213,34 @@ namespace Batbeetle
 
             this.SendCommand(cmd);
             return this.ReadStringResponse();
+        }
+
+        public int SetBit(byte[] key, byte[] offset, byte[] value)
+        {
+            var cmd = new Command(Commands.SetBit);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(offset);
+            cmd.ArgList.Add(value);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int SetRange(byte[] key, byte[] offset, byte[] value)
+        {
+            var cmd = new Command(Commands.SetRange);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(offset);
+            cmd.ArgList.Add(value);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int StrLen(byte[] key)
+        {
+            var cmd = new Command(Commands.StrLen);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
         }
         #endregion
 

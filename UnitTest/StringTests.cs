@@ -511,5 +511,125 @@ namespace UnitTest
                 Assert.IsNull(result2);
             }
         }
+
+        [TestMethod]
+        public void Set_ValidKeyValue_ShouldSucceed()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "myvalue");
+                var result = client.Get("mykey");
+                Assert.IsNotNull(result);
+                Assert.AreEqual("myvalue\r\n", result);
+            }
+        }
+
+        [TestMethod]
+        [Ignore]
+        public void Set_WithEx_ShouldExpireKeyInSpecifiedSeconds()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "myvalue", 2, null, false, true);
+                //wait 2 sec
+                System.Threading.Thread.Sleep(2000);
+                var result = client.Get("mykey");
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        [Ignore]
+        public void Set_WithPx_ShouldExpireKeyInSpecifiedMilliSeconds()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "myvalue", null, 2, false, true);
+                //wait 2000 ms
+                System.Threading.Thread.Sleep(2000);
+                var result = client.Get("mykey");
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void Set_WithNx_SetIfKeyDoesNotExist()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "myvalue");
+                client.Set("mykey", "modified value", null, null, true, false);
+                var result = client.Get("mykey");
+                Assert.IsNotNull(result);
+                Assert.AreEqual("myvalue\r\n", result);
+            }
+        }
+
+        [TestMethod]
+        public void Set_WithXx_SetIfKeyAlreadyExist()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "myvalue");
+                client.Set("mykey", "modified value", null, null, false, true);
+                var result = client.Get("mykey");
+                Assert.IsNotNull(result);
+                Assert.AreEqual("modified value\r\n", result);
+                client.Set("nonExistingKey", "modified value", null, null, false, true);
+                result = client.Get("nonExistingKey");
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void SetBit_ValidParams_SetTheBits()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                //7th position from the right at mykey: 0000000 -> 1000000
+                //SetBit returns the original value stored that that place
+                var result = client.SetBit("mykey".ToByte(), "7".ToByte(), "1".ToByte());
+                Assert.AreEqual(0, result);
+                result = client.SetBit("mykey".ToByte(), "7".ToByte(), "0".ToByte());
+                Assert.AreEqual(1, result);
+                var result2 = client.Get("mykey");
+                Assert.IsNotNull(result2);
+                Assert.AreEqual("\0\r\n", result2);
+            }
+        }
+
+        [TestMethod]
+        public void SetRange_ValidParams_SetAndReturnLengthOfValue()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "Hello World");
+                var result = client.SetRange("mykey".ToByte(), "6".ToByte(), "Redis".ToByte());
+                Assert.AreEqual(11, result);
+                var result2 = client.Get("mykey");
+                Assert.AreEqual("Hello Redis\r\n", result2);
+            }
+        }
+
+        [TestMethod]
+        public void StrLen_ValidKey_ReturnLength()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "Hello World");
+                var result = client.StrLen("mykey".ToByte());
+                Assert.AreEqual(11, result);
+            }
+        }
+
+        [TestMethod]
+        public void StrLen_NonExistingKey_ReturnZero()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.StrLen("nonExistingKey".ToByte());
+                Assert.AreEqual(0, result);
+            }
+        }
     }
 }
