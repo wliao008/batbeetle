@@ -520,28 +520,22 @@ namespace UnitTest
         }
 
         [TestMethod]
-        [Ignore]
         public void Set_WithEx_ShouldExpireKeyInSpecifiedSeconds()
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "myvalue", 2, null, false, true);
-                //wait 2 sec
-                System.Threading.Thread.Sleep(2000);
+                client.Set("mykey", "myvalue", 0, null, false, true); //expire immediately
                 var result = client.Get("mykey");
                 Assert.IsNull(result);
             }
         }
 
         [TestMethod]
-        [Ignore]
         public void Set_WithPx_ShouldExpireKeyInSpecifiedMilliSeconds()
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "myvalue", null, 2, false, true);
-                //wait 2000 ms
-                System.Threading.Thread.Sleep(2000);
+                client.Set("mykey", "myvalue", null, 0, false, true); //expire immediately
                 var result = client.Get("mykey");
                 Assert.IsNull(result);
             }

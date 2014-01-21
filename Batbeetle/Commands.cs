@@ -39,6 +39,12 @@
         public static readonly byte[] Del = new byte[] { 0x44, 0x45, 0x4C };
         public static readonly byte[] Expire = new byte[] { 0x45, 0x58, 0x50, 0x49, 0x52, 0x45 };
         public static readonly byte[] Dump = new byte[] { 0x44, 0x55, 0x4d, 0x50 };
+        public static readonly byte[] Exists = new byte[] { 0x45, 0x58, 0x49, 0x53, 0x54, 0x53 };
+        public static readonly byte[] Ttl = new byte[] { 0x54, 0x54, 0x4C };
+        public static readonly byte[] ExpireAt = new byte[] { 0x45, 0x58, 0x50, 0x49, 0x52, 0x45, 0x41, 0x54 };
+        public static readonly byte[] Keys = new byte[] { 0x4B, 0x45, 0x59, 0x53 };
+        public static readonly byte[] Migrate = new byte[] { 0x4D, 0x49, 0x47, 0x52, 0x41, 0x54, 0x45 };
+        public static readonly byte[] Move = new byte[] { 0x4D, 0x4F, 0x56, 0x45 };
 
         //connection
         public static readonly byte[] Ping = new byte[] { 0x50, 0x49, 0x4E, 0x47 };
@@ -55,5 +61,9 @@
         public static readonly byte[] Px = new byte[] { 0x50, 0x58 };
         public static readonly byte[] Nx = new byte[] { 0x4E, 0x58 };
         public static readonly byte[] Xx = new byte[] { 0x58, 0x58 };
+
+        //args for Migrate
+        public static readonly byte[] Copy = new byte[] { 0x43, 0x4F, 0x50, 0x59 };
+        public static readonly byte[] Replace = new byte[] { 0x52, 0x45, 0x50, 0x4C, 0x41, 0x43, 0x45 };
     }
 }

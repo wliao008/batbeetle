@@ -269,9 +269,26 @@ namespace Batbeetle
         #endregion
 
         #region Keys
-        public int Del(byte[] key)
+        public int Del(params byte[][] keys)
         {
             var cmd = new Command(Commands.Del);
+            foreach(var key in keys)
+            cmd.ArgList.Add(key);
+                this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public byte[] Dump(byte[] key)
+        {
+            var cmd = new Command(Commands.Dump);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public int Exists(byte[] key)
+        {
+            var cmd = new Command(Commands.Exists);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
             return this.ReadIntResponse().Value;
@@ -286,12 +303,61 @@ namespace Batbeetle
             return this.ReadIntResponse().Value;
         }
 
-        public string Dump(byte[] key)
+        public int ExpireAt(byte[] key, byte[] timestamp)
         {
-            var cmd = new Command(Commands.Dump);
+            var cmd = new Command(Commands.ExpireAt);
             cmd.ArgList.Add(key);
+            cmd.ArgList.Add(timestamp);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public byte[] Keys(byte[] pattern)
+        {
+            var cmd = new Command(Commands.Keys);
+            cmd.ArgList.Add(pattern);
+            this.SendCommand(cmd);
+            return this.ReadMultibulkResponse();
+        }
+
+        public string Migrate(
+            byte[] host, 
+            byte[] port, 
+            byte[] key,
+            byte[] destinationDb,
+            byte[] timeout,
+            bool copy,
+            bool replace)
+        {
+            var cmd = new Command(Commands.Migrate);
+            cmd.ArgList.Add(host);
+            cmd.ArgList.Add(port);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(destinationDb);
+            cmd.ArgList.Add(timeout);
+            if (copy)
+                cmd.ArgList.Add(Commands.Copy);
+            if (replace)
+                cmd.ArgList.Add(Commands.Replace);
             this.SendCommand(cmd);
             return this.ReadStringResponse();
+        }
+
+        public int Move(byte[] key, byte[] db)
+        {
+            var cmd = new Command(Commands.Move);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(db);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int Ttl(byte[] key)
+        {
+            var cmd = new Command(Commands.Ttl);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
         }
         #endregion
 
