@@ -235,5 +235,134 @@ namespace UnitTest
                 Assert.AreEqual("string\r\n", result.BytesToString());
             }
         }
+
+        [TestMethod]
+        public void GetRange_NonExistingStringKey_ReturnEmptyString()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                var result = client.GetRange("nonExistingKey".ToByte(), "0".ToByte(), "-1".ToByte());
+                Assert.AreEqual("\r\n", result.BytesToString());
+            }
+        }
+
+        [TestMethod]
+        public void GetRange_OnWrongData_ReturnError()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                Hashtable tbl = new Hashtable();
+                tbl["name"] = "test";
+                tbl["age"] = 1;
+                client.HMSet("mykey", tbl);
+                var result = client.GetRange("mykey".ToByte(), "0".ToByte(), "-1".ToByte());
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void GetSet_ValidParams_SetThenGetTheValueStoredAtKey()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                client.Incr("mycounter".ToByte()); //1
+                var result = client.GetSet("mycounter".ToByte(), "0".ToByte());
+                var result2 = client.Get("mycounter");
+                Assert.AreEqual("1\r\n", result.BytesToString());
+                Assert.AreEqual("0\r\n", result2);
+            }
+        }
+
+        [TestMethod]
+        public void GetSet_InValidParams_ReturnNil()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                var result = client.GetSet("nonExistingKey".ToByte(), "0".ToByte());
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void GetSet_NonStringDataType_ReturnNil()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                Hashtable tbl = new Hashtable();
+                tbl["name"] = "test";
+                tbl["age"] = 1;
+                client.HMSet("mykey", tbl);
+                var result = client.GetSet("mykey".ToByte(), "0".ToByte());
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void Incr_ExistingKey_IncremenNumbertBy1()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                client.Set("mykey", "10");
+                var result = client.Incr("mykey".ToByte());
+                Assert.AreEqual(11, result);
+            }
+        }
+
+        [TestMethod]
+        public void Incr_NonExistingKey_ReturnOne()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                //set nonExistingKey to 0, then perform the operation
+                var result = client.Incr("nonExistingKey".ToByte());
+                Assert.AreEqual(1, result);
+            }
+        }
+
+        [TestMethod]
+        public void Incr_Non64bitIntParsableKey_ReturnError()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                //limits to 64bit signed int.
+                client.Set("mykey", "234293482390480948029348230948");
+                var result = client.Incr("mykey".ToByte());
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void IncrBy_ExistingKey_IncremenNumbertBySpecified()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                client.Set("mykey", "10");
+                var result = client.IncrBy("mykey".ToByte(), "5".ToByte());
+                Assert.AreEqual(15, result);
+            }
+        }
+
+        [TestMethod]
+        public void IncrBy_NonExistingKey_ReturnSpecified()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                //set nonExistingKey to 0, then perform the operation
+                var result = client.IncrBy("nonExistingKey".ToByte(), "5".ToByte());
+                Assert.AreEqual(5, result);
+            }
+        }
+
+        [TestMethod]
+        public void IncrBy_Non64bitIntParsableKey_ReturnNil()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                //limits to 64bit signed int.
+                client.Set("mykey", "234293482390480948029348230948");
+                var result = client.IncrBy("mykey".ToByte(), "5".ToByte());
+                Assert.IsNull(result);
+            }
+        }
     }
 }

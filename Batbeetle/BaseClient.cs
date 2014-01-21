@@ -372,8 +372,8 @@ namespace Batbeetle
             }
 
             int len = 0;
-            int.TryParse(str.Substring(1), out len);
-            if (len > 0)
+            var parsed = int.TryParse(str.Substring(1), out len);
+            if (len >=0 && parsed)
             {
                 len += 2;
                 var tmp = new byte[len];
