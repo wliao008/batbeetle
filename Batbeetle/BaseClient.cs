@@ -570,8 +570,9 @@ namespace Batbeetle
             int c;
             while ((c = bs.ReadByte()) != -1)
             {
-                sb.Append((char)c);
+                if (c == '\r') continue;
                 if (c == '\n') break;
+                sb.Append((char)c);
             }
             return sb.ToString();
         }
@@ -602,7 +603,7 @@ namespace Batbeetle
         private byte[] ReadBulkResponse()
         {
             var str = this.ReadLine();
-            if (str == "$-1\r\n") return null;
+            if (str == "$-1") return null;
             if (str[0] == '-')
             {
                 HandlError(str);
@@ -613,7 +614,7 @@ namespace Batbeetle
             var parsed = int.TryParse(str.Substring(1), out len);
             if (len >=0 && parsed)
             {
-                len += 2;
+                //len += 2;
                 var tmp = new byte[len];
                 var bytesRecd = 0;
                 while (bytesRecd < len)
@@ -621,6 +622,10 @@ namespace Batbeetle
                     int rcd = bs.Read(tmp, bytesRecd, len - bytesRecd);
                     bytesRecd += rcd;
                 }
+
+                bs.ReadByte();
+                bs.ReadByte();
+
                 return tmp;
             }
             else
@@ -635,6 +640,7 @@ namespace Batbeetle
         private byte[] ReadMultibulkResponse()
         {
             var lines = this.ReadIntResponse();
+            var actualines = 0;
             List<byte[]> listbytes = new List<byte[]>();
             var totalLen = 0;
             while (lines > 0)
@@ -644,11 +650,13 @@ namespace Batbeetle
                 {
                     totalLen += bytes.Length;
                     listbytes.Add(bytes);
+                    listbytes.Add(new byte[] { 0x0A });
+                    actualines++;
                 }
                 lines--;
             }
 
-            byte[] sum = new byte[totalLen];
+            byte[] sum = new byte[totalLen + actualines];
             int idx = 0;
             listbytes.ForEach(x =>
             {

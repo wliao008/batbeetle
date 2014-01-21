@@ -131,7 +131,7 @@ namespace UnitTest
                 client.Set("four", "4");
                 var result = client.Keys("*o*".ToByte());
                 Assert.IsNotNull(result);
-                Assert.AreEqual("four\r\ntwo\r\none\r\n", result.BytesToString());
+                Assert.AreEqual("four\ntwo\none\n", result.BytesToString());
             }
         }
 
@@ -146,7 +146,7 @@ namespace UnitTest
                 client.Set("four", "4");
                 var result = client.Keys("t??".ToByte());
                 Assert.IsNotNull(result);
-                Assert.AreEqual("two\r\n", result.BytesToString());
+                Assert.AreEqual("two\n", result.BytesToString());
             }
         }
 
@@ -161,7 +161,7 @@ namespace UnitTest
                 client.Set("four", "4");
                 var result = client.Keys("*".ToByte());
                 Assert.IsNotNull(result);
-                Assert.AreEqual("four\r\nthree\r\ntwo\r\none\r\n", result.BytesToString());
+                Assert.AreEqual("four\nthree\ntwo\none\n", result.BytesToString());
             }
         }
 
@@ -190,7 +190,7 @@ namespace UnitTest
                 Assert.AreEqual(1, result);
                 client.Select("1".ToByte());
                 var result2 = client.Get("mykey");
-                Assert.AreEqual("val\r\n", result2);
+                Assert.AreEqual("val", result2);
             }
         }
 
@@ -244,7 +244,7 @@ namespace UnitTest
                 client.Set("mykey", "val");
                 var result = client.ObjectEncoding("mykey".ToByte());
                 Assert.IsNotNull(result);
-                Assert.AreEqual("raw\r\n", result.BytesToString());
+                Assert.AreEqual("raw", result.BytesToString());
             }
         }
 
@@ -256,7 +256,7 @@ namespace UnitTest
                 client.Set("mykey", "10");
                 var result = client.ObjectEncoding("mykey".ToByte());
                 Assert.IsNotNull(result);
-                Assert.AreEqual("int\r\n", result.BytesToString());
+                Assert.AreEqual("int", result.BytesToString());
             }
         }
 
@@ -268,11 +268,11 @@ namespace UnitTest
                 client.Set("mykey", "1000");
                 var result = client.ObjectEncoding("mykey".ToByte());
                 Assert.IsNotNull(result);
-                Assert.AreEqual("int\r\n", result.BytesToString());
+                Assert.AreEqual("int", result.BytesToString());
                 client.Append("mykey".ToByte(), "bar".ToByte());
                 result = client.ObjectEncoding("mykey".ToByte());
                 Assert.IsNotNull(result);
-                Assert.AreEqual("raw\r\n", result.BytesToString());
+                Assert.AreEqual("raw", result.BytesToString());
             }
         }
 
@@ -419,7 +419,7 @@ namespace UnitTest
                 Assert.IsNull(result);
                 result = client.Get("mynewkey");
                 Assert.IsNotNull(result);
-                Assert.AreEqual("val\r\n", result);
+                Assert.AreEqual("val", result);
             }
         }
 
@@ -444,7 +444,7 @@ namespace UnitTest
                 client.Rename("mykey".ToByte(), "mynewkey".ToByte());
                 var result = client.Get("mynewkey");
                 Assert.IsNotNull(result);
-                Assert.AreEqual("val\r\n", result);
+                Assert.AreEqual("val", result);
             }
         }
 
@@ -458,7 +458,7 @@ namespace UnitTest
                 client.RenameNx("mykey".ToByte(), "mynewkey".ToByte());
                 var result = client.Get("mynewkey");
                 Assert.IsNotNull(result);
-                Assert.AreEqual("new value\r\n", result);
+                Assert.AreEqual("new value", result);
             }
         }
 
@@ -471,7 +471,7 @@ namespace UnitTest
                 client.RenameNx("mykey".ToByte(), "mynewkey".ToByte());
                 var result = client.Get("mynewkey");
                 Assert.IsNotNull(result);
-                Assert.AreEqual("val\r\n", result);
+                Assert.AreEqual("val", result);
             }
         }
 
@@ -497,7 +497,7 @@ namespace UnitTest
                 client.Del("mykey".ToByte());
                 var result = client.Restore("mykey".ToByte(), "0".ToByte(), serializedVal);
                 Assert.IsNotNull(result);
-                Assert.AreEqual("OK\r\n", result);
+                Assert.AreEqual("OK", result);
             }
         }
     }

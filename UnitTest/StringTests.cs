@@ -15,7 +15,7 @@ namespace UnitTest
                 client.Set("existingKey", "Hello");
                 client.Append("existingKey".ToByte(), " World".ToByte());
                 var result = client.Get("existingKey");
-                Assert.AreEqual("Hello World\r\n", result);
+                Assert.AreEqual("Hello World", result);
             }
         }
 
@@ -27,7 +27,7 @@ namespace UnitTest
                 client.Append("nonExistingKey".ToByte(), "Hello".ToByte());
                 client.Append("nonExistingKey".ToByte(), " World".ToByte());
                 var result = client.Get("nonExistingKey");
-                Assert.AreEqual("Hello World\r\n", result);
+                Assert.AreEqual("Hello World", result);
             }
         }
 
@@ -143,7 +143,7 @@ namespace UnitTest
             {
                 client.Set("mykey", "value");
                 var result = client.Get("mykey");
-                Assert.AreEqual("value\r\n", result);
+                Assert.AreEqual("value", result);
             }
         }
 
@@ -214,13 +214,13 @@ namespace UnitTest
             {
                 client.Set("mykey", "This is a string");
                 var result = client.GetRange("mykey".ToByte(), "0".ToByte(), "3".ToByte());
-                Assert.AreEqual("This\r\n", result.BytesToString());
+                Assert.AreEqual("This", result.BytesToString());
                 result = client.GetRange("mykey".ToByte(), "-3".ToByte(), "-1".ToByte());
-                Assert.AreEqual("ing\r\n", result.BytesToString());
+                Assert.AreEqual("ing", result.BytesToString());
                 result = client.GetRange("mykey".ToByte(), "0".ToByte(), "-1".ToByte());
-                Assert.AreEqual("This is a string\r\n", result.BytesToString());
+                Assert.AreEqual("This is a string", result.BytesToString());
                 result = client.GetRange("mykey".ToByte(), "10".ToByte(), "100".ToByte());
-                Assert.AreEqual("string\r\n", result.BytesToString());
+                Assert.AreEqual("string", result.BytesToString());
             }
         }
 
@@ -230,7 +230,7 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 var result = client.GetRange("nonExistingKey".ToByte(), "0".ToByte(), "-1".ToByte());
-                Assert.AreEqual("\r\n", result.BytesToString());
+                Assert.AreEqual("", result.BytesToString());
             }
         }
 
@@ -256,8 +256,8 @@ namespace UnitTest
                 client.Incr("mycounter".ToByte()); //1
                 var result = client.GetSet("mycounter".ToByte(), "0".ToByte());
                 var result2 = client.Get("mycounter");
-                Assert.AreEqual("1\r\n", result.BytesToString());
-                Assert.AreEqual("0\r\n", result2);
+                Assert.AreEqual("1", result.BytesToString());
+                Assert.AreEqual("0", result2);
             }
         }
 
@@ -360,7 +360,7 @@ namespace UnitTest
             {
                 client.Set("mykey", "10.50");
                 var result = client.IncrByFloat("mykey".ToByte(), "0.1".ToByte());
-                Assert.AreEqual("10.6\r\n", result.BytesToString());
+                Assert.AreEqual("10.6", result.BytesToString());
             }
         }
 
@@ -371,7 +371,7 @@ namespace UnitTest
             {
                 client.Set("mykey", "5.0e3");
                 var result = client.IncrByFloat("mykey".ToByte(), "2.0e2".ToByte());
-                Assert.AreEqual("5200\r\n", result.BytesToString());
+                Assert.AreEqual("5200", result.BytesToString());
             }
         }
 
@@ -382,7 +382,7 @@ namespace UnitTest
             {
                 //set nonExistingKey to 0, then perform the operation
                 var result = client.IncrByFloat("nonExistingKey".ToByte(), "0.25".ToByte());
-                Assert.AreEqual("0.25\r\n", result.BytesToString());
+                Assert.AreEqual("0.25", result.BytesToString());
             }
         }
 
@@ -410,7 +410,7 @@ namespace UnitTest
                 client.Set("key3", "value3");
                 var result = client.MGet("key1".ToByte(), "key2".ToByte(), "key3".ToByte());
                 Assert.IsNotNull(result);
-                Assert.AreEqual("value1\r\nvalue2\r\nvalue3\r\n", result.BytesToString());
+                Assert.AreEqual("value1\nvalue2\nvalue3\n", result.BytesToString());
             }
         }
 
@@ -424,7 +424,7 @@ namespace UnitTest
                 client.Set("key3", "value3");
                 var result = client.MGet("key1".ToByte(), "key2".ToByte(), "key333333".ToByte());
                 Assert.IsNotNull(result);
-                Assert.AreEqual("value1\r\nvalue2\r\n", result.BytesToString());
+                Assert.AreEqual("value1\nvalue2\n", result.BytesToString());
             }
         }
 
@@ -454,7 +454,7 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 var result = client.MSet(keys, vals);
-                Assert.AreEqual("OK\r\n", result);
+                Assert.AreEqual("OK", result);
             }
         }
 
@@ -515,7 +515,7 @@ namespace UnitTest
                 client.Set("mykey", "myvalue");
                 var result = client.Get("mykey");
                 Assert.IsNotNull(result);
-                Assert.AreEqual("myvalue\r\n", result);
+                Assert.AreEqual("myvalue", result);
             }
         }
 
@@ -550,7 +550,7 @@ namespace UnitTest
                 client.Set("mykey", "modified value", null, null, true, false);
                 var result = client.Get("mykey");
                 Assert.IsNotNull(result);
-                Assert.AreEqual("myvalue\r\n", result);
+                Assert.AreEqual("myvalue", result);
             }
         }
 
@@ -563,7 +563,7 @@ namespace UnitTest
                 client.Set("mykey", "modified value", null, null, false, true);
                 var result = client.Get("mykey");
                 Assert.IsNotNull(result);
-                Assert.AreEqual("modified value\r\n", result);
+                Assert.AreEqual("modified value", result);
                 client.Set("nonExistingKey", "modified value", null, null, false, true);
                 result = client.Get("nonExistingKey");
                 Assert.IsNull(result);
@@ -583,7 +583,7 @@ namespace UnitTest
                 Assert.AreEqual(1, result);
                 var result2 = client.Get("mykey");
                 Assert.IsNotNull(result2);
-                Assert.AreEqual("\0\r\n", result2);
+                Assert.AreEqual("\0", result2);
             }
         }
 
@@ -596,7 +596,7 @@ namespace UnitTest
                 var result = client.SetRange("mykey".ToByte(), "6".ToByte(), "Redis".ToByte());
                 Assert.AreEqual(11, result);
                 var result2 = client.Get("mykey");
-                Assert.AreEqual("Hello Redis\r\n", result2);
+                Assert.AreEqual("Hello Redis", result2);
             }
         }
 
