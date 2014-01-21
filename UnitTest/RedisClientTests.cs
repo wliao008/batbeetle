@@ -218,5 +218,22 @@ namespace UnitTest
                 Assert.AreEqual(0, result);
             }
         }
+
+        [TestMethod]
+        public void GetRange_ValidStringKey_ReturnSubstring()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                client.Set("mykey", "This is a string");
+                var result = client.GetRange("mykey".ToByte(), "0".ToByte(), "3".ToByte());
+                Assert.AreEqual("This\r\n", result.BytesToString());
+                result = client.GetRange("mykey".ToByte(), "-3".ToByte(), "-1".ToByte());
+                Assert.AreEqual("ing\r\n", result.BytesToString());
+                result = client.GetRange("mykey".ToByte(), "0".ToByte(), "-1".ToByte());
+                Assert.AreEqual("This is a string\r\n", result.BytesToString());
+                result = client.GetRange("mykey".ToByte(), "10".ToByte(), "100".ToByte());
+                Assert.AreEqual("string\r\n", result.BytesToString());
+            }
+        }
     }
 }
