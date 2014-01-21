@@ -296,13 +296,6 @@ namespace Batbeetle
         #endregion
 
         #region Server
-        public string Ping()
-        {
-            var cmd = new Command(Commands.Ping);
-            this.SendCommand(cmd);
-            return this.ReadStringResponse();
-        }
-
         public string[] Info()
         {
             var cmd = new Command(Commands.Info);
@@ -359,6 +352,46 @@ namespace Batbeetle
             return this.ReadStringResponse();
         }
 
+        #endregion
+
+        #region Connection
+        public string Auth(byte[] password)
+        {
+            var cmd = new Command(Commands.Auth);
+            cmd.ArgList.Add(password);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+
+        public byte[] Echo(byte[] message)
+        {
+            var cmd = new Command(Commands.Echo);
+            cmd.ArgList.Add(message);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public string Ping()
+        {
+            var cmd = new Command(Commands.Ping);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+
+        public string Quit()
+        {
+            var cmd = new Command(Commands.Quit);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+
+        public string Select(byte[] index)
+        {
+            var cmd = new Command(Commands.Select);
+            cmd.ArgList.Add(index);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
         #endregion
 
         protected internal void SendCommand(Command cmd)

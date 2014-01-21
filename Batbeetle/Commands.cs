@@ -2,7 +2,6 @@
 {
     public static class Commands
     {
-        public static readonly byte[] Ping = new byte[] { 0x50, 0x49, 0x4E, 0x47 };
         public static readonly byte[] Info = new byte[] { 0x49, 0x4E, 0x46, 0x4F };
 
         //string
@@ -40,6 +39,13 @@
         public static readonly byte[] Del = new byte[] { 0x44, 0x45, 0x4C };
         public static readonly byte[] Expire = new byte[] { 0x45, 0x58, 0x50, 0x49, 0x52, 0x45 };
         public static readonly byte[] Dump = new byte[] { 0x44, 0x55, 0x4d, 0x50 };
+
+        //connection
+        public static readonly byte[] Ping = new byte[] { 0x50, 0x49, 0x4E, 0x47 };
+        public static readonly byte[] Auth = new byte[] { 0x41, 0x55, 0x54, 0x48 };
+        public static readonly byte[] Echo = new byte[] { 0x45, 0x43, 0x48, 0x4F };
+        public static readonly byte[] Quit = new byte[] { 0x51, 0x55, 0x49, 0x54 };
+        public static readonly byte[] Select = new byte[] { 0x53, 0x45, 0x4C, 0x45, 0x43, 0x54 };
 
         //server
         public static readonly byte[] FlushAll = new byte[] { 0x46, 0x4C, 0x55, 0x53, 0x48, 0x41, 0x4C, 0x4C };
