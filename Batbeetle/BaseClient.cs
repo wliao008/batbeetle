@@ -157,6 +157,15 @@ namespace Batbeetle
             return this.ReadIntResponse();
         }
 
+        public byte[] IncrByFloat(byte[] key, byte[] increment)
+        {
+            var cmd = new Command(Commands.IncrByFloat);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(increment);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
         public int SetBit(byte[] key, byte[] offset, byte[] value)
         {
             var cmd = new Command(Commands.SetBit);

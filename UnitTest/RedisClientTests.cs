@@ -364,5 +364,52 @@ namespace UnitTest
                 Assert.IsNull(result);
             }
         }
+
+        [TestMethod]
+        public void IncrByFloat_ExistingKey_IncremenNumbertBySpecified()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                client.Set("mykey", "10.50");
+                var result = client.IncrByFloat("mykey".ToByte(), "0.1".ToByte());
+                Assert.AreEqual("10.6\r\n", result.BytesToString());
+            }
+        }
+
+        [TestMethod]
+        public void IncrByFloat_ExistingKey_IncremenNumbertBySpecified2()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                client.Set("mykey", "5.0e3");
+                var result = client.IncrByFloat("mykey".ToByte(), "2.0e2".ToByte());
+                Assert.AreEqual("5200\r\n", result.BytesToString());
+            }
+        }
+
+        [TestMethod]
+        public void IncrByFloat_NonExistingKey_ReturnSpecified()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                //set nonExistingKey to 0, then perform the operation
+                var result = client.IncrByFloat("nonExistingKey".ToByte(), "0.25".ToByte());
+                Assert.AreEqual("0.25\r\n", result.BytesToString());
+            }
+        }
+
+        [TestMethod]
+        public void IncrByFloat_WrongDataType_ReturnNil()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                Hashtable tbl = new Hashtable();
+                tbl["name"] = "test";
+                tbl["age"] = 1;
+                client.HMSet("mykey", tbl);
+                var result = client.IncrByFloat("mykey".ToByte(), "0.1".ToByte());
+                Assert.IsNull(result);
+            }
+        }
     }
 }
