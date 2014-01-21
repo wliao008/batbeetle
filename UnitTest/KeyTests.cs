@@ -348,5 +348,104 @@ namespace UnitTest
                 Assert.AreEqual(0, result);
             }
         }
+
+        [TestMethod]
+        public void PTtl_KeyWithExpiration_ReturnTtlInMilliseconds()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "val");
+                client.Expire("mykey".ToByte(), "1".ToByte());
+                var result = client.PTtl("mykey".ToByte());
+                Assert.AreNotEqual(-2, result);
+                Assert.AreNotEqual(-1, result);
+                Assert.AreNotEqual(0, result);
+            }
+        }
+
+        [TestMethod]
+        public void PTtl_KeyWithNoExpiration_ReturnMinusOne()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "val");
+                var result = client.PTtl("mykey".ToByte());
+                Assert.AreEqual(-1, result);
+            }
+        }
+
+        [TestMethod]
+        public void PTtl_NonExistingKey_ReturnMinusOne()
+        {
+            //this is only for v2.6 or older, 
+            //in v2.8+, non existing key returns -2
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.PTtl("nonExistingKey".ToByte());
+                Assert.AreEqual(-1, result);
+            }
+        }
+
+        [TestMethod]
+        public void RandomKey_ExistingKeys_ReturnARandomKey()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                for (int i = 0; i < 10; ++i)
+                    client.Set("key" + i, i.ToString());
+                var result = client.RandomKey();
+                Assert.IsNotNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void RandomKey_NoExistingKeys_ReturnNil()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.RandomKey();
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void Rename_ExistingKey_ShouldRenameToNewKey()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "val");
+                client.Rename("mykey".ToByte(), "mynewkey".ToByte());
+                var result = client.Get("mykey");
+                Assert.IsNull(result);
+                result = client.Get("mynewkey");
+                Assert.IsNotNull(result);
+                Assert.AreEqual("val\r\n", result);
+            }
+        }
+
+        [TestMethod]
+        public void Rename_SameKey_ReturnNull()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "val");
+                var result = client.Rename("mykey".ToByte(), "mykey".ToByte());
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void Rename_TargetKeyExist_ShouldOverwrite()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "val");
+                client.Set("mynewkey", "new value");
+                client.Rename("mykey".ToByte(), "mynewkey".ToByte());
+                var result = client.Get("mynewkey");
+                Assert.IsNotNull(result);
+                Assert.AreEqual("val\r\n", result);
+            }
+        }
     }
 }

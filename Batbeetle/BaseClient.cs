@@ -402,6 +402,30 @@ namespace Batbeetle
             return this.ReadIntResponse().Value;
         }
 
+        public int PTtl(byte[] key)
+        {
+            var cmd = new Command(Commands.PTtl);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public byte[] RandomKey()
+        {
+            var cmd = new Command(Commands.RandomKey);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public string Rename(byte[] key, byte[] newkey)
+        {
+            var cmd = new Command(Commands.Rename);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(newkey);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+
         public int Ttl(byte[] key)
         {
             var cmd = new Command(Commands.Ttl);
@@ -537,7 +561,12 @@ namespace Batbeetle
             var str = this.ReadLine();
             if (string.IsNullOrEmpty(str))
                 throw new Exception("Response is empty");
-            Console.WriteLine("ReadStringResponse: " + str);
+            if (str[0] == '-')
+            {
+                HandlError(str);
+                return null;
+            }
+
             return str.Substring(1);
         }
 
