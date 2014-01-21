@@ -447,5 +447,58 @@ namespace UnitTest
                 Assert.AreEqual("val\r\n", result);
             }
         }
+
+        [TestMethod]
+        public void RenameNx_TargetKeyExist_ShouldReturnZero()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "val");
+                client.Set("mynewkey", "new value");
+                client.RenameNx("mykey".ToByte(), "mynewkey".ToByte());
+                var result = client.Get("mynewkey");
+                Assert.IsNotNull(result);
+                Assert.AreEqual("new value\r\n", result);
+            }
+        }
+
+        [TestMethod]
+        public void RenameNx_TargetKeyNotExist_ShouldSetAndReturnOne()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "val");
+                client.RenameNx("mykey".ToByte(), "mynewkey".ToByte());
+                var result = client.Get("mynewkey");
+                Assert.IsNotNull(result);
+                Assert.AreEqual("val\r\n", result);
+            }
+        }
+
+        [TestMethod]
+        public void RenameNx_SameKey_ReturnNull()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "val");
+                var result = client.RenameNx("mykey".ToByte(), "mykey".ToByte());
+                Assert.AreEqual(0, result);
+            }
+        }
+
+        [TestMethod]
+        [Ignore]
+        public void Restore_FromValidDeserializedValue_ShouldRestoreKeyVal()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "hi");
+                var serializedVal = client.Dump("mykey".ToByte());
+                client.Del("mykey".ToByte());
+                var result = client.Restore("mykey".ToByte(), "0".ToByte(), serializedVal);
+                Assert.IsNotNull(result);
+                Assert.AreEqual("OK\r\n", result);
+            }
+        }
     }
 }

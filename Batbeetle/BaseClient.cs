@@ -426,6 +426,26 @@ namespace Batbeetle
             return this.ReadStringResponse();
         }
 
+        public int? RenameNx(byte[] key, byte[] newkey)
+        {
+            var cmd = new Command(Commands.RenameNx);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(newkey);
+            this.SendCommand(cmd);
+            var result = this.ReadIntResponse();
+            return result.HasValue ? result.Value : 0;
+        }
+
+        public string Restore(byte[] key, byte[] ttl, byte[] serializedValue)
+        {
+            var cmd = new Command(Commands.Restore);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(ttl);
+            cmd.ArgList.Add(serializedValue);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+
         public int Ttl(byte[] key)
         {
             var cmd = new Command(Commands.Ttl);
