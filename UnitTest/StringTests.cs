@@ -477,5 +477,39 @@ namespace UnitTest
                 Assert.IsNull(result);
             }
         }
+
+        [TestMethod]
+        public void MSetNx_ValidParams_ReturnOne()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var keys = new byte[2][];
+                var vals = new byte[2][];
+                keys[0] = "key1".ToByte(); vals[0] = "val1".ToByte();
+                keys[1] = "key2".ToByte(); vals[1] = "val2".ToByte();
+
+                var result = client.MSetNx(keys, vals);
+                Assert.AreEqual(1, result);
+            }
+        }
+
+        [TestMethod]
+        public void MSetNx_AnyKeyExist_ReturnZero()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("key1", "val");
+                var keys = new byte[2][];
+                var vals = new byte[2][];
+                keys[0] = "key1".ToByte(); vals[0] = "val1".ToByte(); //key1 already exist
+                keys[1] = "key2".ToByte(); vals[1] = "val2".ToByte();
+
+                var result = client.MSetNx(keys, vals);
+                Assert.AreEqual(0, result);
+                //Operation is atomic, so key2 should not be set if key1 is not
+                var result2 = client.Get("key2");
+                Assert.IsNull(result2);
+            }
+        }
     }
 }
