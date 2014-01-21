@@ -43,16 +43,73 @@ namespace UnitTest
         }
 
         [TestMethod]
-        public void Bitcount_IfString_ReturnNumOfBitsSetTo1()
+        public void BitCount_IfString_ReturnNumOfBitsSetTo1()
         {
             using (var client = new RedisClient(Host))
             {
                 client.Set("mykey", "foobar");
-                var result = client.Bitcount("mykey".ToByte(), null, null);
+                var result = client.BitCount("mykey".ToByte(), null, null);
                 Assert.AreEqual(26, result);
                 client.Set("mykey", "1"); //-> note, 1 is treated as a char value of 49.
-                result = client.Bitcount("mykey".ToByte(), null, null);
+                result = client.BitCount("mykey".ToByte(), null, null);
                 Assert.AreEqual(3, result);
+            }
+        }
+
+        [TestMethod]
+        public void BitCount_StartEnd_ReturnNumOfBitsSetTo1()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                client.Set("mykey", "foobar");
+                var result = client.BitCount("mykey".ToByte(), "0".ToByte(), "0".ToByte());
+                Assert.AreEqual(4, result);
+                result = client.BitCount("mykey".ToByte(), "1".ToByte(), "1".ToByte());
+                Assert.AreEqual(6, result);
+            }
+        }
+
+        [TestMethod]
+        public void BitCount_NonExistingKey_ReturnZero()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                var result = client.BitCount("nonExistingKey".ToByte(), null, null);
+                Assert.AreEqual(0, result);
+            }
+        }
+
+        [TestMethod]
+        public void Decr_ExistingKey_DecremenNumbertBy1()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                client.Set("mykey", "10");
+                var result = client.Decr("mykey".ToByte());
+                Assert.AreEqual(9, result);
+            }
+        }
+
+        [TestMethod]
+        public void Decr_NonExistingKey_ReturnMinusOne()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                //set nonExistingKey to 0, then perform the operation
+                var result = client.Decr("nonExistingKey".ToByte());
+                Assert.AreEqual(-1, result);
+            }
+        }
+
+        [TestMethod]
+        public void Decr_NonIntParsableKey_ReturnError()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                //limits to 64bit signed int.
+                client.Set("mykey", "234293482390480948029348230948");
+                var result = client.Decr("mykey".ToByte());
+                Assert.IsNull(result);
             }
         }
     }

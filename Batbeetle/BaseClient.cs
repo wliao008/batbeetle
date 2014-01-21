@@ -67,10 +67,10 @@ namespace Batbeetle
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(value);
             this.SendCommand(cmd);
-            return this.ReadIntResponse();
+            return this.ReadIntResponse().Value;
         }
 
-        public int Bitcount(byte[] key, byte[] start, byte[] end)
+        public int BitCount(byte[] key, byte[] start, byte[] end)
         {
             var cmd = new Command(Commands.Bitcount);
             cmd.ArgList.Add(key);
@@ -79,10 +79,10 @@ namespace Batbeetle
             if (end != null)
                 cmd.ArgList.Add(end);
             this.SendCommand(cmd);
-            return this.ReadIntResponse();
+            return this.ReadIntResponse().Value;
         }
 
-        public int Decr(byte[] key)
+        public int? Decr(byte[] key)
         {
             var cmd = new Command(Commands.Decr);
             cmd.ArgList.Add(key);
@@ -90,7 +90,7 @@ namespace Batbeetle
             return this.ReadIntResponse();
         }
 
-        public int DecrBy(byte[] key, byte[] decrement)
+        public int? DecrBy(byte[] key, byte[] decrement)
         {
             var cmd = new Command(Commands.DecrBy);
             cmd.ArgList.Add(key);
@@ -118,7 +118,7 @@ namespace Batbeetle
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(offset);
             this.SendCommand(cmd);
-            return this.ReadIntResponse();
+            return this.ReadIntResponse().Value;
         }
 
         public byte[] GetRange(byte[] key, byte[] start, byte[] end)
@@ -140,7 +140,7 @@ namespace Batbeetle
             return this.ReadBulkResponse();
         }
 
-        public int Incr(byte[] key)
+        public int? Incr(byte[] key)
         {
             var cmd = new Command(Commands.Incr);
             cmd.ArgList.Add(key);
@@ -148,7 +148,7 @@ namespace Batbeetle
             return this.ReadIntResponse();
         }
 
-        public int IncrBy(byte[] key, byte[] increment)
+        public int? IncrBy(byte[] key, byte[] increment)
         {
             var cmd = new Command(Commands.IncrBy);
             cmd.ArgList.Add(key);
@@ -164,7 +164,7 @@ namespace Batbeetle
             cmd.ArgList.Add(offset);
             cmd.ArgList.Add(value);
             this.SendCommand(cmd);
-            return this.ReadIntResponse();
+            return this.ReadIntResponse().Value;
         }
 
         public string Set(byte[] key, byte[] value, byte[] ex, byte[] px, bool nx, bool xx)
@@ -225,7 +225,7 @@ namespace Batbeetle
             var cmd = new Command(Commands.Del);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
-            return this.ReadIntResponse();
+            return this.ReadIntResponse().Value;
         }
 
         public int Expire(byte[] key, byte[] seconds)
@@ -234,7 +234,7 @@ namespace Batbeetle
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(seconds);
             this.SendCommand(cmd);
-            return this.ReadIntResponse();
+            return this.ReadIntResponse().Value;
         }
 
         public string Dump(byte[] key)
@@ -352,12 +352,13 @@ namespace Batbeetle
             return str.Substring(1);
         }
 
-        private int ReadIntResponse()
+        private int? ReadIntResponse()
         {
             var resp = this.ReadStringResponse();
             int ret = 0;
-            int.TryParse(resp, out ret);
-            return ret;
+            if(int.TryParse(resp, out ret))
+                return ret;
+            return null;
         }
 
         private byte[] ReadBulkResponse()
