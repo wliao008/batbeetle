@@ -203,5 +203,150 @@ namespace UnitTest
                 Assert.AreEqual(0, result);
             }
         }
+
+        [TestMethod]
+        public void Object_RefCountValidKey_ReturnRefCount()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "val");
+                var result = client.Object(Commands.RefCount, "mykey".ToByte());
+                Assert.AreEqual(1, result);
+            }
+        }
+
+        [TestMethod]
+        public void Object_RefCountInValidKey_ReturnNil()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.Object(Commands.RefCount, "nonExistingKey".ToByte());
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void Object_IdleTimeValidKey_ReturnTimeIdled()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "val");
+                var result = client.Object(Commands.IdleTime, "mykey".ToByte());
+                Assert.IsNotNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void ObjectEncoding_ValidKey_ReturnEncoding()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "val");
+                var result = client.ObjectEncoding("mykey".ToByte());
+                Assert.IsNotNull(result);
+                Assert.AreEqual("raw\r\n", result.BytesToString());
+            }
+        }
+
+        [TestMethod]
+        public void ObjectEncoding_ValidKey_ReturnEncoding2()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "10");
+                var result = client.ObjectEncoding("mykey".ToByte());
+                Assert.IsNotNull(result);
+                Assert.AreEqual("int\r\n", result.BytesToString());
+            }
+        }
+
+        [TestMethod]
+        public void ObjectEncoding_ValidKeyChangedData_ReturnCorrectEncoding()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "1000");
+                var result = client.ObjectEncoding("mykey".ToByte());
+                Assert.IsNotNull(result);
+                Assert.AreEqual("int\r\n", result.BytesToString());
+                client.Append("mykey".ToByte(), "bar".ToByte());
+                result = client.ObjectEncoding("mykey".ToByte());
+                Assert.IsNotNull(result);
+                Assert.AreEqual("raw\r\n", result.BytesToString());
+            }
+        }
+
+        [TestMethod]
+        public void Persist_ValidKey_RemoveTimeout()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "1000", 10);
+                var result = client.Ttl("mykey".ToByte());
+                Assert.AreNotEqual(-1, result);
+                client.Persist("mykey".ToByte()); 
+                result = client.Ttl("mykey".ToByte());
+                Assert.AreEqual(-1, result);
+            }
+        }
+
+        [TestMethod]
+        public void Persist_InValidKey_ReturnZero()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.Persist("nonExistingKey".ToByte());
+                Assert.AreEqual(0, result);
+            }
+        }
+
+        [TestMethod]
+        public void PExpire_ValidKey_ReturnOne()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "10");
+                var result = client.Ttl("mykey".ToByte());
+                Assert.AreEqual(-1, result);
+                result = client.PExpire("mykey".ToByte(), "10000".ToByte());
+                Assert.AreEqual(1, result);
+                result = client.Ttl("mykey".ToByte());
+                Assert.AreNotEqual(-1, result);
+            }
+        }
+
+        [TestMethod]
+        public void PExpire_InValidKey_ReturnZero()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.PExpire("nonExistingKey".ToByte(), "10000".ToByte());
+                Assert.AreEqual(0, result);
+            }
+        }
+
+        [TestMethod]
+        public void PExpireAt_ValidKey_ReturnOne()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "10");
+                var result = client.Exists("mykey".ToByte());
+                Assert.AreEqual(1, result);
+                client.PExpireAt("mykey".ToByte(), "1293840000".ToByte());
+                result = client.Exists("mykey".ToByte());
+                Assert.AreEqual(0, result);
+            }
+        }
+
+        [TestMethod]
+        public void PExpireAt_InValidKey_ReturnZero()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.PExpireAt("nonExistingKey".ToByte(), "1293840000".ToByte());
+                Assert.AreEqual(0, result);
+            }
+        }
     }
 }

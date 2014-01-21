@@ -352,6 +352,56 @@ namespace Batbeetle
             return this.ReadIntResponse().Value;
         }
 
+        /// <summary>
+        /// For RefCount, IdleTime
+        /// </summary>
+        public int? Object(byte[] subcommand, byte[] key)
+        {
+            var cmd = new Command(Commands.Object);
+            cmd.ArgList.Add(subcommand);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            var result = this.ReadIntResponse();
+            if (result == -1)
+                return null;
+            return result;
+        }
+
+        public byte[] ObjectEncoding(byte[] key)
+        {
+            var cmd = new Command(Commands.Object);
+            cmd.ArgList.Add(Commands.Encoding);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public int Persist(byte[] key)
+        {
+            var cmd = new Command(Commands.Persist);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int PExpire(byte[] key, byte[] seconds)
+        {
+            var cmd = new Command(Commands.PExpire);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(seconds);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int PExpireAt(byte[] key, byte[] millisecondTimestamp)
+        {
+            var cmd = new Command(Commands.PExpireAt);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(millisecondTimestamp);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
         public int Ttl(byte[] key)
         {
             var cmd = new Command(Commands.Ttl);
