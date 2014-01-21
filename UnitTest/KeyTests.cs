@@ -487,7 +487,6 @@ namespace UnitTest
         }
 
         [TestMethod]
-        [Ignore]
         public void Restore_FromValidDeserializedValue_ShouldRestoreKeyVal()
         {
             using (var client = new RedisClient(this.Host))
