@@ -404,5 +404,48 @@ namespace UnitTest
                 Assert.IsNull(result);
             }
         }
+
+        [TestMethod]
+        public void MGet_ValidParams_ReturnValues()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("key1", "value1");
+                client.Set("key2", "value2");
+                client.Set("key3", "value3");
+                var result = client.MGet("key1".ToByte(), "key2".ToByte(), "key3".ToByte());
+                Assert.IsNotNull(result);
+                Assert.AreEqual("value1\r\nvalue2\r\nvalue3\r\n", result.BytesToString());
+            }
+        }
+
+        [TestMethod]
+        public void MGet_NonExistingKey_ReturnNil()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("key1", "value1");
+                client.Set("key2", "value2");
+                client.Set("key3", "value3");
+                var result = client.MGet("key1".ToByte(), "key2".ToByte(), "key333333".ToByte());
+                Assert.IsNotNull(result);
+                Assert.AreEqual("value1\r\nvalue2\r\n", result.BytesToString());
+            }
+        }
+
+        [TestMethod]
+        public void MGet_WrongDataType_ReturnNil()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                Hashtable tbl = new Hashtable();
+                tbl["name"] = "test";
+                tbl["age"] = 1;
+                client.HMSet("mykey", tbl);
+                var result = client.MGet("mykey".ToByte()); //this op should never fail
+                Assert.IsNotNull(result);
+                Assert.AreEqual("", result.BytesToString());
+            }
+        }
     }
 }

@@ -43,23 +43,6 @@ namespace Batbeetle
             bs = new BufferedStream(new NetworkStream(this.Socket), BUFFERSIZE);
         }
 
-        public string Ping()
-        {
-            var cmd = new Command(Commands.Ping);
-            this.SendCommand(cmd);
-            return this.ReadStringResponse();
-        }
-
-        public string[] Info()
-        {
-            var cmd = new Command(Commands.Info);
-            this.SendCommand(cmd);
-            var resp = this.ReadBulkResponse();
-            var str = Encoding.UTF8.GetString(resp);
-            var data = str.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            return data;
-        }
-
         #region Strings
         public int Append(byte[] key, byte[] value)
         {
@@ -166,6 +149,15 @@ namespace Batbeetle
             return this.ReadBulkResponse();
         }
 
+        public byte[] MGet(params byte[][] keys)
+        {
+            var cmd = new Command(Commands.MGet);
+            foreach(var key in keys)
+                cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadMultibulkResponse();
+        }
+
         public int SetBit(byte[] key, byte[] offset, byte[] value)
         {
             var cmd = new Command(Commands.SetBit);
@@ -255,12 +247,31 @@ namespace Batbeetle
         }
         #endregion
 
+        #region Server
+        public string Ping()
+        {
+            var cmd = new Command(Commands.Ping);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+
+        public string[] Info()
+        {
+            var cmd = new Command(Commands.Info);
+            this.SendCommand(cmd);
+            var resp = this.ReadBulkResponse();
+            var str = Encoding.UTF8.GetString(resp);
+            var data = str.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            return data;
+        }
+
         public string FlushAll()
         {
             var cmd = new Command(Commands.FlushAll);
             this.SendCommand(cmd);
             return this.ReadStringResponse();
         }
+        #endregion
 
         #region Transaction
         public string Multi()
@@ -301,34 +312,6 @@ namespace Batbeetle
         }
 
         #endregion
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            // For thread safety, use a lock around these  
-            // operations, as well as in methods that use the resource. 
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    if (this.Socket != null)
-                    {
-                        this.Socket.Dispose();
-                        Console.WriteLine("Object disposed.");
-                    }
-                }
-
-                this.Socket = null;
-
-                // Indicate that the instance has been disposed.
-                disposed = true;
-            }
-        }
 
         protected internal void SendCommand(Command cmd)
         {
@@ -434,5 +417,33 @@ namespace Batbeetle
             //log the error
         }
         #endregion
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            // For thread safety, use a lock around these  
+            // operations, as well as in methods that use the resource. 
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    if (this.Socket != null)
+                    {
+                        this.Socket.Dispose();
+                        Console.WriteLine("Object disposed.");
+                    }
+                }
+
+                this.Socket = null;
+
+                // Indicate that the instance has been disposed.
+                disposed = true;
+            }
+        }
     }
 }
