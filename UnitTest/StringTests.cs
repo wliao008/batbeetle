@@ -447,5 +447,35 @@ namespace UnitTest
                 Assert.AreEqual("", result.BytesToString());
             }
         }
+
+        [TestMethod]
+        public void MSet_ValidParama_SetKeysValues()
+        {
+            var keys = new byte[2][];
+            var vals = new byte[2][];
+            keys[0] = "key1".ToByte(); vals[0] = "val1".ToByte();
+            keys[1] = "key2".ToByte(); vals[1] = "val2".ToByte();
+
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.MSet(keys, vals);
+                Assert.AreEqual("OK\r\n", result);
+            }
+        }
+
+        [TestMethod]
+        public void MSet_WrongArgs_ReturnNil()
+        {
+            var keys = new byte[2][];
+            var vals = new byte[1][];
+            keys[0] = "key1".ToByte(); vals[0] = "val1".ToByte();
+            keys[1] = "key2".ToByte(); //missing val for key2
+
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.MSet(keys, vals);
+                Assert.IsNull(result);
+            }
+        }
     }
 }

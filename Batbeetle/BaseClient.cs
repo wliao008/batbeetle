@@ -158,6 +158,21 @@ namespace Batbeetle
             return this.ReadMultibulkResponse();
         }
 
+        public string MSet(byte[][] keys, byte[][] values)
+        {
+            if (keys.Length != values.Length)
+                return null;
+
+            var cmd = new Command(Commands.MSet);
+            for (int i = 0; i < keys.Length; ++i)
+            {
+                cmd.ArgList.Add(keys[i]);
+                cmd.ArgList.Add(values[i]);
+            }
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+
         public int SetBit(byte[] key, byte[] offset, byte[] value)
         {
             var cmd = new Command(Commands.SetBit);
