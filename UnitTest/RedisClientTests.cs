@@ -182,5 +182,41 @@ namespace UnitTest
                 Assert.IsNull(result);
             }
         }
+
+        [TestMethod]
+        public void GetBit_ExistingStringKey_ReturnBitAtSpecifiedOffset()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                client.SetBit("mykey".ToByte(), "7".ToByte(), "1".ToByte());
+                var result = client.GetBit("mykey".ToByte(), "0".ToByte());
+                Assert.AreEqual(0, result);
+                result = client.GetBit("mykey".ToByte(), "7".ToByte());
+                Assert.AreEqual(1, result);
+                result = client.GetBit("mykey".ToByte(), "100".ToByte());
+                Assert.AreEqual(0, result);
+            }
+        }
+
+        [TestMethod]
+        public void GetBit_ExistingStringKeyWrongOffset_ReturnZero()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                client.SetBit("mykey".ToByte(), "7".ToByte(), "1".ToByte());
+                var result = client.GetBit("mykey".ToByte(), "100".ToByte());
+                Assert.AreEqual(0, result);
+            }
+        }
+
+        [TestMethod]
+        public void GetBit_NonExistingStringKey_ReturnZero()
+        {
+            using (var client = new RedisClient(Host))
+            {
+                var result = client.GetBit("nonExistingKey".ToByte(), "1".ToByte());
+                Assert.AreEqual(0, result);
+            }
+        }
     }
 }
