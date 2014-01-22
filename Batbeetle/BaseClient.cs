@@ -614,6 +614,11 @@ namespace Batbeetle
             return sb.ToString();
         }
 
+        public int Available()
+        {
+            return this.Socket.Available;
+        }
+
         private string ReadStringResponse()
         {
             var str = this.ReadLine();
@@ -674,7 +679,7 @@ namespace Batbeetle
             }
         }
 
-        private byte[] ReadMultibulkResponse()
+        protected internal byte[] ReadMultibulkResponse()
         {
             var lines = this.ReadIntResponse();
             var actualines = 0;

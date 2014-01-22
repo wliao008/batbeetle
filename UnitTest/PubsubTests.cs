@@ -1,6 +1,7 @@
 ﻿using Batbeetle;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.ComponentModel;
+using System.Threading;
 
 namespace UnitTest
 {
@@ -19,22 +20,39 @@ namespace UnitTest
         public void Subscribe_ValidParams_ShouldSubscribeToChannels()
         {
             BackgroundWorker subscriber = new BackgroundWorker();
+            BackgroundWorker publisher = new BackgroundWorker();
             subscriber.DoWork += (s, e) =>
             {
                 using (var client = new RedisClient(this.Host))
                 {
-                    var result = client.Subscribe("foo".ToByte());
-                    Assert.IsNotNull(result);
-                    Assert.AreEqual("message\nfoo\nhello\n", result.BytesToString());
+                    var pubsub = new RedisPubSub(client);
+                    pubsub.OnSubscribed += (s1, e1) =>
+                    {
+                        System.Diagnostics.Debug.WriteLine("Subscribed!");
+                        publisher.RunWorkerAsync();
+                    };
+                    pubsub.OnMessageReceived += (s2, e2) =>
+                    {
+                        System.Diagnostics.Debug.WriteLine("Msg rec'd");
+                        System.Diagnostics.Debug.WriteLine(e2.Message.BytesToString());
+                    };
+
+                    pubsub.SubscribeToChannel("foo");
+                    //Assert.IsNotNull(result);
+                    //Assert.AreEqual("message\nfoo\nhello\n", result.BytesToString());
                 }
             };
             subscriber.RunWorkerAsync();
 
-            using (var client = new RedisClient(this.Host))
+            publisher.DoWork += (t, f) =>
             {
-                var result = client.Publish("foo".ToByte(), "hello".ToByte());
-                Assert.IsNotNull(result);
-            }
+                using (var client = new RedisClient(this.Host))
+                {
+                    var result = client.Publish("foo".ToByte(), "hello".ToByte());
+                    System.Diagnostics.Debug.WriteLine("Published msg");
+                    Assert.IsNotNull(result);
+                }
+            };
         }
     }
 }
