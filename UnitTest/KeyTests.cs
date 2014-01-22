@@ -210,7 +210,7 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 client.Set("mykey", "val");
-                var result = client.Object(Commands.RefCount, "mykey".ToByte());
+                var result = client.Object(Commands.Refcount, "mykey".ToByte());
                 Assert.AreEqual(1, result);
             }
         }
@@ -220,7 +220,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                var result = client.Object(Commands.RefCount, "nonExistingKey".ToByte());
+                var result = client.Object(Commands.Refcount, "nonExistingKey".ToByte());
                 Assert.IsNull(result);
             }
         }
@@ -231,7 +231,7 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 client.Set("mykey", "val");
-                var result = client.Object(Commands.IdleTime, "mykey".ToByte());
+                var result = client.Object(Commands.Idletime, "mykey".ToByte());
                 Assert.IsNotNull(result);
             }
         }

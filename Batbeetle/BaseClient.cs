@@ -75,7 +75,7 @@ namespace Batbeetle
 
         public int? DecrBy(byte[] key, byte[] decrement)
         {
-            var cmd = new Command(Commands.DecrBy);
+            var cmd = new Command(Commands.Decrby);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(decrement);
             this.SendCommand(cmd);
@@ -97,7 +97,7 @@ namespace Batbeetle
 
         public int GetBit(byte[] key, byte[] offset)
         {
-            var cmd = new Command(Commands.GetBit);
+            var cmd = new Command(Commands.Getbit);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(offset);
             this.SendCommand(cmd);
@@ -106,7 +106,7 @@ namespace Batbeetle
 
         public byte[] GetRange(byte[] key, byte[] start, byte[] end)
         {
-            var cmd = new Command(Commands.GetRange);
+            var cmd = new Command(Commands.Getrange);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(start);
             cmd.ArgList.Add(end);
@@ -116,7 +116,7 @@ namespace Batbeetle
 
         public byte[] GetSet(byte[] key, byte[] value)
         {
-            var cmd = new Command(Commands.GetSet);
+            var cmd = new Command(Commands.Getset);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(value);
             this.SendCommand(cmd);
@@ -133,7 +133,7 @@ namespace Batbeetle
 
         public int? IncrBy(byte[] key, byte[] increment)
         {
-            var cmd = new Command(Commands.IncrBy);
+            var cmd = new Command(Commands.Incrby);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(increment);
             this.SendCommand(cmd);
@@ -142,7 +142,7 @@ namespace Batbeetle
 
         public byte[] IncrByFloat(byte[] key, byte[] increment)
         {
-            var cmd = new Command(Commands.IncrByFloat);
+            var cmd = new Command(Commands.Incrbyfloat);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(increment);
             this.SendCommand(cmd);
@@ -151,7 +151,7 @@ namespace Batbeetle
 
         public byte[] MGet(params byte[][] keys)
         {
-            var cmd = new Command(Commands.MGet);
+            var cmd = new Command(Commands.Mget);
             foreach(var key in keys)
                 cmd.ArgList.Add(key);
             this.SendCommand(cmd);
@@ -163,7 +163,7 @@ namespace Batbeetle
             if (keys.Length != values.Length)
                 return null;
 
-            var cmd = new Command(Commands.MSet);
+            var cmd = new Command(Commands.Mset);
             for (int i = 0; i < keys.Length; ++i)
             {
                 cmd.ArgList.Add(keys[i]);
@@ -178,7 +178,7 @@ namespace Batbeetle
             if (keys.Length != values.Length)
                 return null;
 
-            var cmd = new Command(Commands.MSetNx);
+            var cmd = new Command(Commands.Msetnx);
             for (int i = 0; i < keys.Length; ++i)
             {
                 cmd.ArgList.Add(keys[i]);
@@ -217,7 +217,7 @@ namespace Batbeetle
 
         public int SetBit(byte[] key, byte[] offset, byte[] value)
         {
-            var cmd = new Command(Commands.SetBit);
+            var cmd = new Command(Commands.Setbit);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(offset);
             cmd.ArgList.Add(value);
@@ -227,7 +227,7 @@ namespace Batbeetle
 
         public int SetRange(byte[] key, byte[] offset, byte[] value)
         {
-            var cmd = new Command(Commands.SetRange);
+            var cmd = new Command(Commands.Setrange);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(offset);
             cmd.ArgList.Add(value);
@@ -237,7 +237,7 @@ namespace Batbeetle
 
         public int StrLen(byte[] key)
         {
-            var cmd = new Command(Commands.StrLen);
+            var cmd = new Command(Commands.Strlen);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
             return this.ReadIntResponse().Value;
@@ -247,7 +247,7 @@ namespace Batbeetle
         #region Hash
         public string HMSet(byte[] key, byte[][] fieldKeys, byte[][] fieldValues)
         {
-            var cmd = new Command(Commands.HMSet);
+            var cmd = new Command(Commands.Hmset);
             cmd.ArgList.Add(key);
             for (int i = 0; i < fieldKeys.Length; ++i)
             {
@@ -260,7 +260,7 @@ namespace Batbeetle
 
         public byte[] HMGetAll(byte[] key)
         {
-            var cmd = new Command(Commands.HGetAll);
+            var cmd = new Command(Commands.Hgetall);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
             var resp = this.ReadMultibulkResponse();
@@ -305,7 +305,7 @@ namespace Batbeetle
 
         public int ExpireAt(byte[] key, byte[] timestamp)
         {
-            var cmd = new Command(Commands.ExpireAt);
+            var cmd = new Command(Commands.Expireat);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(timestamp);
             this.SendCommand(cmd);
@@ -386,7 +386,7 @@ namespace Batbeetle
 
         public int PExpire(byte[] key, byte[] seconds)
         {
-            var cmd = new Command(Commands.PExpire);
+            var cmd = new Command(Commands.Pexpire);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(seconds);
             this.SendCommand(cmd);
@@ -395,7 +395,7 @@ namespace Batbeetle
 
         public int PExpireAt(byte[] key, byte[] millisecondTimestamp)
         {
-            var cmd = new Command(Commands.PExpireAt);
+            var cmd = new Command(Commands.Pexpireat);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(millisecondTimestamp);
             this.SendCommand(cmd);
@@ -404,7 +404,7 @@ namespace Batbeetle
 
         public int PTtl(byte[] key)
         {
-            var cmd = new Command(Commands.PTtl);
+            var cmd = new Command(Commands.Pttl);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
             return this.ReadIntResponse().Value;
@@ -412,7 +412,7 @@ namespace Batbeetle
 
         public byte[] RandomKey()
         {
-            var cmd = new Command(Commands.RandomKey);
+            var cmd = new Command(Commands.Randomkey);
             this.SendCommand(cmd);
             return this.ReadBulkResponse();
         }
@@ -428,7 +428,7 @@ namespace Batbeetle
 
         public int? RenameNx(byte[] key, byte[] newkey)
         {
-            var cmd = new Command(Commands.RenameNx);
+            var cmd = new Command(Commands.Renamenx);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(newkey);
             this.SendCommand(cmd);
@@ -468,7 +468,7 @@ namespace Batbeetle
 
         public string FlushAll()
         {
-            var cmd = new Command(Commands.FlushAll);
+            var cmd = new Command(Commands.Flushall);
             this.SendCommand(cmd);
             return this.ReadStringResponse();
         }

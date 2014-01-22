@@ -1,6 +1,6 @@
 namespace Batbeetle
 {
-    public static class Commands
+    public static partial class Commands
     {
         //set
         public static readonly byte[] Sadd = new byte[] { 0x53, 0x41, 0x44, 0x44 };
