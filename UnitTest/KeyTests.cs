@@ -1,5 +1,6 @@
 ﻿using Batbeetle;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace UnitTest
@@ -509,6 +510,41 @@ namespace UnitTest
                 var result = client.Restore("mykey".ToByte(), "0".ToByte(), serializedVal);
                 Assert.IsNotNull(result);
                 Assert.AreEqual("OK", result);
+            }
+        }
+
+        [TestMethod]
+        public void Type_ValidKeyString_ReturnStringDataType()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("mykey", "val");
+                var result = client.Type("mykey".ToByte());
+                Assert.AreEqual("string", result);
+            }
+        }
+
+        [TestMethod]
+        public void Type_ValidKeyHash_ReturnHashDataType()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                Hashtable tbl = new Hashtable();
+                tbl["key1"] = "val1";
+                tbl["age"] = 2;
+                client.HMSet("mykey", tbl);
+                var result = client.Type("mykey".ToByte());
+                Assert.AreEqual("hash", result);
+            }
+        }
+
+        [TestMethod]
+        public void Type_InValidKey_ReturnNone()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.Type("mykey".ToByte());
+                Assert.AreEqual("none", result);
             }
         }
     }

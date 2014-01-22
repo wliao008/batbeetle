@@ -453,6 +453,14 @@ namespace Batbeetle
             this.SendCommand(cmd);
             return this.ReadIntResponse().Value;
         }
+
+        public string Type(byte[] key)
+        {
+            var cmd = new Command(Commands.Type);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
         #endregion
 
         #region Server
