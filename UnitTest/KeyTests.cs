@@ -1,5 +1,6 @@
 ﻿using Batbeetle;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 
 namespace UnitTest
 {
@@ -131,7 +132,12 @@ namespace UnitTest
                 client.Set("four", "4");
                 var result = client.Keys("*o*".ToByte());
                 Assert.IsNotNull(result);
-                Assert.AreEqual("four\ntwo\none\n", result.BytesToString());
+                var split = result.BytesToString().Split(new char[] { '\n' });
+                var list = new List<string>();
+                list.AddRange(split);
+                Assert.IsTrue(list.Contains("one"));
+                Assert.IsTrue(list.Contains("two"));
+                Assert.IsTrue(list.Contains("four"));
             }
         }
 
@@ -161,7 +167,13 @@ namespace UnitTest
                 client.Set("four", "4");
                 var result = client.Keys("*".ToByte());
                 Assert.IsNotNull(result);
-                Assert.AreEqual("four\nthree\ntwo\none\n", result.BytesToString());
+                var split = result.BytesToString().Split(new char[] { '\n' });
+                var list = new List<string>();
+                list.AddRange(split);
+                Assert.IsTrue(list.Contains("one"));
+                Assert.IsTrue(list.Contains("two"));
+                Assert.IsTrue(list.Contains("three"));
+                Assert.IsTrue(list.Contains("four"));
             }
         }
 
