@@ -43,6 +43,201 @@ namespace Batbeetle
             bs = new BufferedStream(new NetworkStream(this.Socket), BUFFERSIZE);
         }
 
+        #region Keys
+        public int Del(params byte[][] keys)
+        {
+            var cmd = new Command(Commands.Del);
+            foreach(var key in keys)
+            cmd.ArgList.Add(key);
+                this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public byte[] Dump(byte[] key)
+        {
+            var cmd = new Command(Commands.Dump);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public int Exists(byte[] key)
+        {
+            var cmd = new Command(Commands.Exists);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int Expire(byte[] key, byte[] seconds)
+        {
+            var cmd = new Command(Commands.Expire);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(seconds);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int ExpireAt(byte[] key, byte[] timestamp)
+        {
+            var cmd = new Command(Commands.Expireat);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(timestamp);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public byte[] Keys(byte[] pattern)
+        {
+            var cmd = new Command(Commands.Keys);
+            cmd.ArgList.Add(pattern);
+            this.SendCommand(cmd);
+            return this.ReadMultibulkResponse();
+        }
+
+        public string Migrate(
+            byte[] host, 
+            byte[] port, 
+            byte[] key,
+            byte[] destinationDb,
+            byte[] timeout,
+            bool copy,
+            bool replace)
+        {
+            var cmd = new Command(Commands.Migrate);
+            cmd.ArgList.Add(host);
+            cmd.ArgList.Add(port);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(destinationDb);
+            cmd.ArgList.Add(timeout);
+            if (copy)
+                cmd.ArgList.Add(Commands.Copy);
+            if (replace)
+                cmd.ArgList.Add(Commands.Replace);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+
+        public int Move(byte[] key, byte[] db)
+        {
+            var cmd = new Command(Commands.Move);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(db);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        /// <summary>
+        /// For RefCount, IdleTime
+        /// </summary>
+        public int? Object(byte[] subcommand, byte[] key)
+        {
+            var cmd = new Command(Commands.Object);
+            cmd.ArgList.Add(subcommand);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            var result = this.ReadIntResponse();
+            if (result == -1)
+                return null;
+            return result;
+        }
+
+        public byte[] ObjectEncoding(byte[] key)
+        {
+            var cmd = new Command(Commands.Object);
+            cmd.ArgList.Add(Commands.Encoding);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public int Persist(byte[] key)
+        {
+            var cmd = new Command(Commands.Persist);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int PExpire(byte[] key, byte[] seconds)
+        {
+            var cmd = new Command(Commands.Pexpire);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(seconds);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int PExpireAt(byte[] key, byte[] millisecondTimestamp)
+        {
+            var cmd = new Command(Commands.Pexpireat);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(millisecondTimestamp);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int PTtl(byte[] key)
+        {
+            var cmd = new Command(Commands.Pttl);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public byte[] RandomKey()
+        {
+            var cmd = new Command(Commands.Randomkey);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public string Rename(byte[] key, byte[] newkey)
+        {
+            var cmd = new Command(Commands.Rename);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(newkey);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+
+        public int? RenameNx(byte[] key, byte[] newkey)
+        {
+            var cmd = new Command(Commands.Renamenx);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(newkey);
+            this.SendCommand(cmd);
+            var result = this.ReadIntResponse();
+            return result.HasValue ? result.Value : 0;
+        }
+
+        public string Restore(byte[] key, byte[] ttl, byte[] serializedValue)
+        {
+            var cmd = new Command(Commands.Restore);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(ttl);
+            cmd.ArgList.Add(serializedValue);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+
+        public int Ttl(byte[] key)
+        {
+            var cmd = new Command(Commands.Ttl);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public string Type(byte[] key)
+        {
+            var cmd = new Command(Commands.Type);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+        #endregion
+
         #region Strings
         public int Append(byte[] key, byte[] value)
         {
@@ -268,217 +463,32 @@ namespace Batbeetle
         }
         #endregion
 
-        #region Keys
-        public int Del(params byte[][] keys)
+        #region Pub/Sub
+        public byte[] PSubscribe(params byte[][] patterns)
         {
-            var cmd = new Command(Commands.Del);
-            foreach(var key in keys)
-            cmd.ArgList.Add(key);
-                this.SendCommand(cmd);
-            return this.ReadIntResponse().Value;
-        }
-
-        public byte[] Dump(byte[] key)
-        {
-            var cmd = new Command(Commands.Dump);
-            cmd.ArgList.Add(key);
-            this.SendCommand(cmd);
-            return this.ReadBulkResponse();
-        }
-
-        public int Exists(byte[] key)
-        {
-            var cmd = new Command(Commands.Exists);
-            cmd.ArgList.Add(key);
-            this.SendCommand(cmd);
-            return this.ReadIntResponse().Value;
-        }
-
-        public int Expire(byte[] key, byte[] seconds)
-        {
-            var cmd = new Command(Commands.Expire);
-            cmd.ArgList.Add(key);
-            cmd.ArgList.Add(seconds);
-            this.SendCommand(cmd);
-            return this.ReadIntResponse().Value;
-        }
-
-        public int ExpireAt(byte[] key, byte[] timestamp)
-        {
-            var cmd = new Command(Commands.Expireat);
-            cmd.ArgList.Add(key);
-            cmd.ArgList.Add(timestamp);
-            this.SendCommand(cmd);
-            return this.ReadIntResponse().Value;
-        }
-
-        public byte[] Keys(byte[] pattern)
-        {
-            var cmd = new Command(Commands.Keys);
-            cmd.ArgList.Add(pattern);
+            var cmd = new Command(Commands.Psubscribe);
+            foreach (var pattern in patterns)
+                cmd.ArgList.Add(pattern);
             this.SendCommand(cmd);
             return this.ReadMultibulkResponse();
         }
 
-        public string Migrate(
-            byte[] host, 
-            byte[] port, 
-            byte[] key,
-            byte[] destinationDb,
-            byte[] timeout,
-            bool copy,
-            bool replace)
+        public int Publish(byte[] channel, byte[] message)
         {
-            var cmd = new Command(Commands.Migrate);
-            cmd.ArgList.Add(host);
-            cmd.ArgList.Add(port);
-            cmd.ArgList.Add(key);
-            cmd.ArgList.Add(destinationDb);
-            cmd.ArgList.Add(timeout);
-            if (copy)
-                cmd.ArgList.Add(Commands.Copy);
-            if (replace)
-                cmd.ArgList.Add(Commands.Replace);
-            this.SendCommand(cmd);
-            return this.ReadStringResponse();
-        }
-
-        public int Move(byte[] key, byte[] db)
-        {
-            var cmd = new Command(Commands.Move);
-            cmd.ArgList.Add(key);
-            cmd.ArgList.Add(db);
+            var cmd = new Command(Commands.Publish);
+            cmd.ArgList.Add(channel);
+            cmd.ArgList.Add(message);
             this.SendCommand(cmd);
             return this.ReadIntResponse().Value;
         }
 
-        /// <summary>
-        /// For RefCount, IdleTime
-        /// </summary>
-        public int? Object(byte[] subcommand, byte[] key)
+        public byte[] Subscribe(params byte[][] channels)
         {
-            var cmd = new Command(Commands.Object);
-            cmd.ArgList.Add(subcommand);
-            cmd.ArgList.Add(key);
+            var cmd = new Command(Commands.Subscribe);
+            foreach (var channel in channels)
+                cmd.ArgList.Add(channel);
             this.SendCommand(cmd);
-            var result = this.ReadIntResponse();
-            if (result == -1)
-                return null;
-            return result;
-        }
-
-        public byte[] ObjectEncoding(byte[] key)
-        {
-            var cmd = new Command(Commands.Object);
-            cmd.ArgList.Add(Commands.Encoding);
-            cmd.ArgList.Add(key);
-            this.SendCommand(cmd);
-            return this.ReadBulkResponse();
-        }
-
-        public int Persist(byte[] key)
-        {
-            var cmd = new Command(Commands.Persist);
-            cmd.ArgList.Add(key);
-            this.SendCommand(cmd);
-            return this.ReadIntResponse().Value;
-        }
-
-        public int PExpire(byte[] key, byte[] seconds)
-        {
-            var cmd = new Command(Commands.Pexpire);
-            cmd.ArgList.Add(key);
-            cmd.ArgList.Add(seconds);
-            this.SendCommand(cmd);
-            return this.ReadIntResponse().Value;
-        }
-
-        public int PExpireAt(byte[] key, byte[] millisecondTimestamp)
-        {
-            var cmd = new Command(Commands.Pexpireat);
-            cmd.ArgList.Add(key);
-            cmd.ArgList.Add(millisecondTimestamp);
-            this.SendCommand(cmd);
-            return this.ReadIntResponse().Value;
-        }
-
-        public int PTtl(byte[] key)
-        {
-            var cmd = new Command(Commands.Pttl);
-            cmd.ArgList.Add(key);
-            this.SendCommand(cmd);
-            return this.ReadIntResponse().Value;
-        }
-
-        public byte[] RandomKey()
-        {
-            var cmd = new Command(Commands.Randomkey);
-            this.SendCommand(cmd);
-            return this.ReadBulkResponse();
-        }
-
-        public string Rename(byte[] key, byte[] newkey)
-        {
-            var cmd = new Command(Commands.Rename);
-            cmd.ArgList.Add(key);
-            cmd.ArgList.Add(newkey);
-            this.SendCommand(cmd);
-            return this.ReadStringResponse();
-        }
-
-        public int? RenameNx(byte[] key, byte[] newkey)
-        {
-            var cmd = new Command(Commands.Renamenx);
-            cmd.ArgList.Add(key);
-            cmd.ArgList.Add(newkey);
-            this.SendCommand(cmd);
-            var result = this.ReadIntResponse();
-            return result.HasValue ? result.Value : 0;
-        }
-
-        public string Restore(byte[] key, byte[] ttl, byte[] serializedValue)
-        {
-            var cmd = new Command(Commands.Restore);
-            cmd.ArgList.Add(key);
-            cmd.ArgList.Add(ttl);
-            cmd.ArgList.Add(serializedValue);
-            this.SendCommand(cmd);
-            return this.ReadStringResponse();
-        }
-
-        public int Ttl(byte[] key)
-        {
-            var cmd = new Command(Commands.Ttl);
-            cmd.ArgList.Add(key);
-            this.SendCommand(cmd);
-            return this.ReadIntResponse().Value;
-        }
-
-        public string Type(byte[] key)
-        {
-            var cmd = new Command(Commands.Type);
-            cmd.ArgList.Add(key);
-            this.SendCommand(cmd);
-            return this.ReadStringResponse();
-        }
-        #endregion
-
-        #region Server
-        public string[] Info()
-        {
-            var cmd = new Command(Commands.Info);
-            this.SendCommand(cmd);
-            var resp = this.ReadBulkResponse();
-            var str = Encoding.UTF8.GetString(resp);
-            var data = str.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            return data;
-        }
-
-        public string FlushAll()
-        {
-            var cmd = new Command(Commands.Flushall);
-            this.SendCommand(cmd);
-            return this.ReadStringResponse();
+            return this.ReadMultibulkResponse();
         }
         #endregion
 
@@ -557,6 +567,25 @@ namespace Batbeetle
         {
             var cmd = new Command(Commands.Select);
             cmd.ArgList.Add(index);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+        #endregion
+
+        #region Server
+        public string[] Info()
+        {
+            var cmd = new Command(Commands.Info);
+            this.SendCommand(cmd);
+            var resp = this.ReadBulkResponse();
+            var str = Encoding.UTF8.GetString(resp);
+            var data = str.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            return data;
+        }
+
+        public string FlushAll()
+        {
+            var cmd = new Command(Commands.Flushall);
             this.SendCommand(cmd);
             return this.ReadStringResponse();
         }

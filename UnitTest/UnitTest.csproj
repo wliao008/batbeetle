@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="ConnectionTests.cs" />
     <Compile Include="KeyTests.cs" />
+    <Compile Include="PubsubTests.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="HashTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
