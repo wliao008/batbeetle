@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Batbeetle
 {
-    public class Command
+    public class RedisCommand
     {
         /*
 *<number of arguments> CR LF
@@ -20,7 +18,7 @@ $<number of bytes of argument N> CR LF
         public int NumArgs { get; set; }
         public byte[] Cmd { get; set; }
         public List<byte[]> ArgList { get; set; }
-        public Command(byte[] cmd)
+        public RedisCommand(byte[] cmd)
         {
             this.Cmd = cmd;
             this.ArgList = new List<byte[]>();

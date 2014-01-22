@@ -46,7 +46,7 @@ namespace Batbeetle
         #region Keys
         public int Del(params byte[][] keys)
         {
-            var cmd = new Command(Commands.Del);
+            var cmd = new RedisCommand(Commands.Del);
             foreach(var key in keys)
             cmd.ArgList.Add(key);
                 this.SendCommand(cmd);
@@ -55,7 +55,7 @@ namespace Batbeetle
 
         public byte[] Dump(byte[] key)
         {
-            var cmd = new Command(Commands.Dump);
+            var cmd = new RedisCommand(Commands.Dump);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
             return this.ReadBulkResponse();
@@ -63,7 +63,7 @@ namespace Batbeetle
 
         public int Exists(byte[] key)
         {
-            var cmd = new Command(Commands.Exists);
+            var cmd = new RedisCommand(Commands.Exists);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
             return this.ReadIntResponse().Value;
@@ -71,7 +71,7 @@ namespace Batbeetle
 
         public int Expire(byte[] key, byte[] seconds)
         {
-            var cmd = new Command(Commands.Expire);
+            var cmd = new RedisCommand(Commands.Expire);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(seconds);
             this.SendCommand(cmd);
@@ -80,7 +80,7 @@ namespace Batbeetle
 
         public int ExpireAt(byte[] key, byte[] timestamp)
         {
-            var cmd = new Command(Commands.Expireat);
+            var cmd = new RedisCommand(Commands.Expireat);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(timestamp);
             this.SendCommand(cmd);
@@ -89,7 +89,7 @@ namespace Batbeetle
 
         public byte[] Keys(byte[] pattern)
         {
-            var cmd = new Command(Commands.Keys);
+            var cmd = new RedisCommand(Commands.Keys);
             cmd.ArgList.Add(pattern);
             this.SendCommand(cmd);
             return this.ReadMultibulkResponse();
@@ -104,7 +104,7 @@ namespace Batbeetle
             bool copy,
             bool replace)
         {
-            var cmd = new Command(Commands.Migrate);
+            var cmd = new RedisCommand(Commands.Migrate);
             cmd.ArgList.Add(host);
             cmd.ArgList.Add(port);
             cmd.ArgList.Add(key);
@@ -120,7 +120,7 @@ namespace Batbeetle
 
         public int Move(byte[] key, byte[] db)
         {
-            var cmd = new Command(Commands.Move);
+            var cmd = new RedisCommand(Commands.Move);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(db);
             this.SendCommand(cmd);
@@ -132,7 +132,7 @@ namespace Batbeetle
         /// </summary>
         public int? Object(byte[] subcommand, byte[] key)
         {
-            var cmd = new Command(Commands.Object);
+            var cmd = new RedisCommand(Commands.Object);
             cmd.ArgList.Add(subcommand);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
@@ -144,7 +144,7 @@ namespace Batbeetle
 
         public byte[] ObjectEncoding(byte[] key)
         {
-            var cmd = new Command(Commands.Object);
+            var cmd = new RedisCommand(Commands.Object);
             cmd.ArgList.Add(Commands.Encoding);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
@@ -153,7 +153,7 @@ namespace Batbeetle
 
         public int Persist(byte[] key)
         {
-            var cmd = new Command(Commands.Persist);
+            var cmd = new RedisCommand(Commands.Persist);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
             return this.ReadIntResponse().Value;
@@ -161,7 +161,7 @@ namespace Batbeetle
 
         public int PExpire(byte[] key, byte[] seconds)
         {
-            var cmd = new Command(Commands.Pexpire);
+            var cmd = new RedisCommand(Commands.Pexpire);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(seconds);
             this.SendCommand(cmd);
@@ -170,7 +170,7 @@ namespace Batbeetle
 
         public int PExpireAt(byte[] key, byte[] millisecondTimestamp)
         {
-            var cmd = new Command(Commands.Pexpireat);
+            var cmd = new RedisCommand(Commands.Pexpireat);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(millisecondTimestamp);
             this.SendCommand(cmd);
@@ -179,7 +179,7 @@ namespace Batbeetle
 
         public int PTtl(byte[] key)
         {
-            var cmd = new Command(Commands.Pttl);
+            var cmd = new RedisCommand(Commands.Pttl);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
             return this.ReadIntResponse().Value;
@@ -187,14 +187,14 @@ namespace Batbeetle
 
         public byte[] RandomKey()
         {
-            var cmd = new Command(Commands.Randomkey);
+            var cmd = new RedisCommand(Commands.Randomkey);
             this.SendCommand(cmd);
             return this.ReadBulkResponse();
         }
 
         public string Rename(byte[] key, byte[] newkey)
         {
-            var cmd = new Command(Commands.Rename);
+            var cmd = new RedisCommand(Commands.Rename);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(newkey);
             this.SendCommand(cmd);
@@ -203,7 +203,7 @@ namespace Batbeetle
 
         public int? RenameNx(byte[] key, byte[] newkey)
         {
-            var cmd = new Command(Commands.Renamenx);
+            var cmd = new RedisCommand(Commands.Renamenx);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(newkey);
             this.SendCommand(cmd);
@@ -213,7 +213,7 @@ namespace Batbeetle
 
         public string Restore(byte[] key, byte[] ttl, byte[] serializedValue)
         {
-            var cmd = new Command(Commands.Restore);
+            var cmd = new RedisCommand(Commands.Restore);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(ttl);
             cmd.ArgList.Add(serializedValue);
@@ -223,7 +223,7 @@ namespace Batbeetle
 
         public int Ttl(byte[] key)
         {
-            var cmd = new Command(Commands.Ttl);
+            var cmd = new RedisCommand(Commands.Ttl);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
             return this.ReadIntResponse().Value;
@@ -231,7 +231,7 @@ namespace Batbeetle
 
         public string Type(byte[] key)
         {
-            var cmd = new Command(Commands.Type);
+            var cmd = new RedisCommand(Commands.Type);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
             return this.ReadStringResponse();
@@ -241,7 +241,7 @@ namespace Batbeetle
         #region Strings
         public int Append(byte[] key, byte[] value)
         {
-            var cmd = new Command(Commands.Append);
+            var cmd = new RedisCommand(Commands.Append);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(value);
             this.SendCommand(cmd);
@@ -250,7 +250,7 @@ namespace Batbeetle
 
         public int BitCount(byte[] key, byte[] start, byte[] end)
         {
-            var cmd = new Command(Commands.Bitcount);
+            var cmd = new RedisCommand(Commands.Bitcount);
             cmd.ArgList.Add(key);
             if (start != null)
                 cmd.ArgList.Add(start);
@@ -262,7 +262,7 @@ namespace Batbeetle
 
         public int? Decr(byte[] key)
         {
-            var cmd = new Command(Commands.Decr);
+            var cmd = new RedisCommand(Commands.Decr);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
             return this.ReadIntResponse();
@@ -270,7 +270,7 @@ namespace Batbeetle
 
         public int? DecrBy(byte[] key, byte[] decrement)
         {
-            var cmd = new Command(Commands.Decrby);
+            var cmd = new RedisCommand(Commands.Decrby);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(decrement);
             this.SendCommand(cmd);
@@ -284,7 +284,7 @@ namespace Batbeetle
 
         public byte[] Get(byte[] key)
         {
-            var cmd = new Command(Commands.Get);
+            var cmd = new RedisCommand(Commands.Get);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
             return this.ReadBulkResponse();
@@ -292,7 +292,7 @@ namespace Batbeetle
 
         public int GetBit(byte[] key, byte[] offset)
         {
-            var cmd = new Command(Commands.Getbit);
+            var cmd = new RedisCommand(Commands.Getbit);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(offset);
             this.SendCommand(cmd);
@@ -301,7 +301,7 @@ namespace Batbeetle
 
         public byte[] GetRange(byte[] key, byte[] start, byte[] end)
         {
-            var cmd = new Command(Commands.Getrange);
+            var cmd = new RedisCommand(Commands.Getrange);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(start);
             cmd.ArgList.Add(end);
@@ -311,7 +311,7 @@ namespace Batbeetle
 
         public byte[] GetSet(byte[] key, byte[] value)
         {
-            var cmd = new Command(Commands.Getset);
+            var cmd = new RedisCommand(Commands.Getset);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(value);
             this.SendCommand(cmd);
@@ -320,7 +320,7 @@ namespace Batbeetle
 
         public int? Incr(byte[] key)
         {
-            var cmd = new Command(Commands.Incr);
+            var cmd = new RedisCommand(Commands.Incr);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
             return this.ReadIntResponse();
@@ -328,7 +328,7 @@ namespace Batbeetle
 
         public int? IncrBy(byte[] key, byte[] increment)
         {
-            var cmd = new Command(Commands.Incrby);
+            var cmd = new RedisCommand(Commands.Incrby);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(increment);
             this.SendCommand(cmd);
@@ -337,7 +337,7 @@ namespace Batbeetle
 
         public byte[] IncrByFloat(byte[] key, byte[] increment)
         {
-            var cmd = new Command(Commands.Incrbyfloat);
+            var cmd = new RedisCommand(Commands.Incrbyfloat);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(increment);
             this.SendCommand(cmd);
@@ -346,7 +346,7 @@ namespace Batbeetle
 
         public byte[] MGet(params byte[][] keys)
         {
-            var cmd = new Command(Commands.Mget);
+            var cmd = new RedisCommand(Commands.Mget);
             foreach(var key in keys)
                 cmd.ArgList.Add(key);
             this.SendCommand(cmd);
@@ -358,7 +358,7 @@ namespace Batbeetle
             if (keys.Length != values.Length)
                 return null;
 
-            var cmd = new Command(Commands.Mset);
+            var cmd = new RedisCommand(Commands.Mset);
             for (int i = 0; i < keys.Length; ++i)
             {
                 cmd.ArgList.Add(keys[i]);
@@ -373,7 +373,7 @@ namespace Batbeetle
             if (keys.Length != values.Length)
                 return null;
 
-            var cmd = new Command(Commands.Msetnx);
+            var cmd = new RedisCommand(Commands.Msetnx);
             for (int i = 0; i < keys.Length; ++i)
             {
                 cmd.ArgList.Add(keys[i]);
@@ -385,7 +385,7 @@ namespace Batbeetle
 
         public string Set(byte[] key, byte[] value, byte[] ex, byte[] px, bool nx, bool xx)
         {
-            var cmd = new Command(Commands.Set);
+            var cmd = new RedisCommand(Commands.Set);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(value);
             if (ex != null)
@@ -412,7 +412,7 @@ namespace Batbeetle
 
         public int SetBit(byte[] key, byte[] offset, byte[] value)
         {
-            var cmd = new Command(Commands.Setbit);
+            var cmd = new RedisCommand(Commands.Setbit);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(offset);
             cmd.ArgList.Add(value);
@@ -422,7 +422,7 @@ namespace Batbeetle
 
         public int SetRange(byte[] key, byte[] offset, byte[] value)
         {
-            var cmd = new Command(Commands.Setrange);
+            var cmd = new RedisCommand(Commands.Setrange);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(offset);
             cmd.ArgList.Add(value);
@@ -432,7 +432,7 @@ namespace Batbeetle
 
         public int StrLen(byte[] key)
         {
-            var cmd = new Command(Commands.Strlen);
+            var cmd = new RedisCommand(Commands.Strlen);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
             return this.ReadIntResponse().Value;
@@ -442,7 +442,7 @@ namespace Batbeetle
         #region Hash
         public string HMSet(byte[] key, byte[][] fieldKeys, byte[][] fieldValues)
         {
-            var cmd = new Command(Commands.Hmset);
+            var cmd = new RedisCommand(Commands.Hmset);
             cmd.ArgList.Add(key);
             for (int i = 0; i < fieldKeys.Length; ++i)
             {
@@ -455,7 +455,7 @@ namespace Batbeetle
 
         public byte[] HMGetAll(byte[] key)
         {
-            var cmd = new Command(Commands.Hgetall);
+            var cmd = new RedisCommand(Commands.Hgetall);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
             var resp = this.ReadMultibulkResponse();
@@ -466,7 +466,7 @@ namespace Batbeetle
         #region Pub/Sub
         public byte[] PSubscribe(params byte[][] patterns)
         {
-            var cmd = new Command(Commands.Psubscribe);
+            var cmd = new RedisCommand(Commands.Psubscribe);
             foreach (var pattern in patterns)
                 cmd.ArgList.Add(pattern);
             this.SendCommand(cmd);
@@ -475,7 +475,7 @@ namespace Batbeetle
 
         public int Publish(byte[] channel, byte[] message)
         {
-            var cmd = new Command(Commands.Publish);
+            var cmd = new RedisCommand(Commands.Publish);
             cmd.ArgList.Add(channel);
             cmd.ArgList.Add(message);
             this.SendCommand(cmd);
@@ -484,7 +484,7 @@ namespace Batbeetle
 
         public byte[] Subscribe(params byte[][] channels)
         {
-            var cmd = new Command(Commands.Subscribe);
+            var cmd = new RedisCommand(Commands.Subscribe);
             foreach (var channel in channels)
                 cmd.ArgList.Add(channel);
             this.SendCommand(cmd);
@@ -495,28 +495,28 @@ namespace Batbeetle
         #region Transaction
         public string Multi()
         {
-            var cmd = new Command(Commands.Multi);
+            var cmd = new RedisCommand(Commands.Multi);
             this.SendCommand(cmd);
             return this.ReadStringResponse();
         }
 
         public byte[] Exec()
         {
-            var cmd = new Command(Commands.Exec);
+            var cmd = new RedisCommand(Commands.Exec);
             this.SendCommand(cmd);
             return this.ReadMultibulkResponse();
         }
 
         public string Discard()
         {
-            var cmd = new Command(Commands.Discard);
+            var cmd = new RedisCommand(Commands.Discard);
             this.SendCommand(cmd);
             return this.ReadStringResponse();
         }
 
         public string Watch(params byte[][] keys)
         {
-            var cmd = new Command(Commands.Watch);
+            var cmd = new RedisCommand(Commands.Watch);
             foreach (var key in keys)
                 cmd.ArgList.Add(key);
             this.SendCommand(cmd);
@@ -525,7 +525,7 @@ namespace Batbeetle
 
         public string Unwatch()
         {
-            var cmd = new Command(Commands.Unwatch);
+            var cmd = new RedisCommand(Commands.Unwatch);
             this.SendCommand(cmd);
             return this.ReadStringResponse();
         }
@@ -535,7 +535,7 @@ namespace Batbeetle
         #region Connection
         public string Auth(byte[] password)
         {
-            var cmd = new Command(Commands.Auth);
+            var cmd = new RedisCommand(Commands.Auth);
             cmd.ArgList.Add(password);
             this.SendCommand(cmd);
             return this.ReadStringResponse();
@@ -543,7 +543,7 @@ namespace Batbeetle
 
         public byte[] Echo(byte[] message)
         {
-            var cmd = new Command(Commands.Echo);
+            var cmd = new RedisCommand(Commands.Echo);
             cmd.ArgList.Add(message);
             this.SendCommand(cmd);
             return this.ReadBulkResponse();
@@ -551,21 +551,21 @@ namespace Batbeetle
 
         public string Ping()
         {
-            var cmd = new Command(Commands.Ping);
+            var cmd = new RedisCommand(Commands.Ping);
             this.SendCommand(cmd);
             return this.ReadStringResponse();
         }
 
         public string Quit()
         {
-            var cmd = new Command(Commands.Quit);
+            var cmd = new RedisCommand(Commands.Quit);
             this.SendCommand(cmd);
             return this.ReadStringResponse();
         }
 
         public string Select(byte[] index)
         {
-            var cmd = new Command(Commands.Select);
+            var cmd = new RedisCommand(Commands.Select);
             cmd.ArgList.Add(index);
             this.SendCommand(cmd);
             return this.ReadStringResponse();
@@ -575,7 +575,7 @@ namespace Batbeetle
         #region Server
         public string[] Info()
         {
-            var cmd = new Command(Commands.Info);
+            var cmd = new RedisCommand(Commands.Info);
             this.SendCommand(cmd);
             var resp = this.ReadBulkResponse();
             var str = Encoding.UTF8.GetString(resp);
@@ -585,13 +585,13 @@ namespace Batbeetle
 
         public string FlushAll()
         {
-            var cmd = new Command(Commands.Flushall);
+            var cmd = new RedisCommand(Commands.Flushall);
             this.SendCommand(cmd);
             return this.ReadStringResponse();
         }
         #endregion
 
-        protected internal void SendCommand(Command cmd)
+        protected internal void SendCommand(RedisCommand cmd)
         {
             if (this.Socket == null)
                 Connect();
