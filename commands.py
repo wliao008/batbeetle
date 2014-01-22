@@ -2,6 +2,7 @@ import json
 
 def generate():
 	final = {}
+	finalist = []
 	jdata = open('commands.json', 'r')
 	data = json.load(jdata)
 	for key in data:
@@ -22,9 +23,13 @@ def generate():
 			if ' ' in cmd:
 				cmds = cmd.split(' ')
 				for cmd2 in cmds:
-					c.write('        public static readonly byte[] ' + cmd2.title() + ' = new byte[] { ' + ", ".join("0x{0:x}".format(ord(c)) for c in cmd2) + ' };\n')
+					if cmd2.title() not in finalist:
+						finalist.append(cmd2.title())
+						c.write('        public static readonly byte[] ' + cmd2.title() + ' = new byte[] { ' + ", ".join("0x{0:x}".format(ord(c)) for c in cmd2) + ' };\n')
 			else:
-				c.write('        public static readonly byte[] ' + cmd.title() + ' = new byte[] { ' + ", ".join("0x{0:x}".format(ord(c)) for c in cmd) + ' };\n')
+				if cmd.title() not in finalist:
+					finalist.append(cmd.title())
+					c.write('        public static readonly byte[] ' + cmd.title() + ' = new byte[] { ' + ", ".join("0x{0:x}".format(ord(c)) for c in cmd) + ' };\n')
 	c.write('    }\n')
 	c.write('}\n')
 if __name__ == '__main__':
