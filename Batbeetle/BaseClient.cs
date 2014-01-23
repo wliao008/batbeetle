@@ -440,6 +440,91 @@ namespace Batbeetle
         #endregion
 
         #region Hash
+        public int HDel(byte[] key, params byte[][] fields)
+        {
+            var cmd = new RedisCommand(Commands.Hdel);
+            cmd.ArgList.Add(key);
+            foreach (var field in fields)
+                cmd.ArgList.Add(field);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int HExists(byte[] key, byte[] field)
+        {
+            var cmd = new RedisCommand(Commands.Hexists);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(field);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public byte[] HGet(byte[] key, byte[] field)
+        {
+            var cmd = new RedisCommand(Commands.Hget);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(field);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public byte[][] HMGetAll(byte[] key)
+        {
+            var cmd = new RedisCommand(Commands.Hgetall);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            var resp = this.ReadMultibulkResponse();
+            return resp;
+        }
+
+        public int? HIncrBy(byte[] key, byte[] field, byte[] increment)
+        {
+            var cmd = new RedisCommand(Commands.Hincrby);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(field);
+            cmd.ArgList.Add(increment);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse();
+        }
+
+        public byte[] HIncrByFloat(byte[] key, byte[] field, byte[] increment)
+        {
+            var cmd = new RedisCommand(Commands.Hincrbyfloat);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(field);
+            cmd.ArgList.Add(increment);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public byte[][] HKeys(byte[] key)
+        {
+            var cmd = new RedisCommand(Commands.Hkeys);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            var resp = this.ReadMultibulkResponse();
+            return resp;
+        }
+
+        public int HLen(byte[] key)
+        {
+            var cmd = new RedisCommand(Commands.Hlen);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public byte[][] HMGet(byte[] key, params byte[][] fields)
+        {
+            var cmd = new RedisCommand(Commands.Hmget);
+            cmd.ArgList.Add(key);
+            foreach(var field in fields)
+                cmd.ArgList.Add(field);
+            this.SendCommand(cmd);
+            var resp = this.ReadMultibulkResponse();
+            return resp;
+        }
+
         public string HMSet(byte[] key, byte[][] fieldKeys, byte[][] fieldValues)
         {
             var cmd = new RedisCommand(Commands.Hmset);
@@ -453,9 +538,29 @@ namespace Batbeetle
             return this.ReadStringResponse();
         }
 
-        public byte[][] HMGetAll(byte[] key)
+        public int HSet(byte[] key, byte[] field, byte[] value)
         {
-            var cmd = new RedisCommand(Commands.Hgetall);
+            var cmd = new RedisCommand(Commands.Hset);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(field);
+            cmd.ArgList.Add(value);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int HSetNx(byte[] key, byte[] field, byte[] value)
+        {
+            var cmd = new RedisCommand(Commands.Hsetnx);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(field);
+            cmd.ArgList.Add(value);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public byte[][] KVals(byte[] key)
+        {
+            var cmd = new RedisCommand(Commands.Hvals);
             cmd.ArgList.Add(key);
             this.SendCommand(cmd);
             var resp = this.ReadMultibulkResponse();
@@ -591,6 +696,7 @@ namespace Batbeetle
         }
         #endregion
 
+        #region Send
         protected internal void SendCommand(RedisCommand cmd)
         {
             if (this.Socket == null)
@@ -599,6 +705,7 @@ namespace Batbeetle
             var bytes = cmd.ToBytes();
             this.Socket.Send(bytes);
         }
+        #endregion
 
         #region Parsing response
         private string ReadLine()
