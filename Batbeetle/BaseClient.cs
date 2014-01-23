@@ -651,6 +651,8 @@ namespace Batbeetle
                 HandlError(str);
                 return null;
             }
+            if (str[0] == ':')
+                return str.Substring(1).ToByte();
 
             int len = 0;
             var parsed = int.TryParse(str.Substring(1), out len);

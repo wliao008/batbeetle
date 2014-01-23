@@ -34,15 +34,15 @@ namespace UnitTest
                     pubsub.OnMessageReceived += (s2, e2) =>
                     {
                         System.Diagnostics.Debug.WriteLine("Msg rec'd");
-                        System.Diagnostics.Debug.WriteLine(e2.Message.BytesToString());
+                        System.Diagnostics.Debug.WriteLine(e2.Message.MultiBytesToString());
+                        Assert.IsNotNull(e2.Message);
+                        Assert.AreEqual("message\r\nfoo\r\nhello\r\n", e2.Message.MultiBytesToString());
+                        client.Quit();
                     };
 
                     pubsub.SubscribeToChannel("foo");
-                    //Assert.IsNotNull(result);
-                    //Assert.AreEqual("message\nfoo\nhello\n", result.BytesToString());
                 }
             };
-            subscriber.RunWorkerAsync();
 
             publisher.DoWork += (t, f) =>
             {
@@ -53,6 +53,8 @@ namespace UnitTest
                     Assert.IsNotNull(result);
                 }
             };
+
+            subscriber.RunWorkerAsync();
         }
     }
 }
