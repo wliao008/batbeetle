@@ -439,7 +439,7 @@ namespace Batbeetle
         }
         #endregion
 
-        #region Hash
+        #region Hashes
         public int HDel(byte[] key, params byte[][] fields)
         {
             var cmd = new RedisCommand(Commands.Hdel);
@@ -568,6 +568,170 @@ namespace Batbeetle
         }
         #endregion
 
+        #region Lists
+        public byte[][] BLPop(byte[] timeout, params byte[][] keys)
+        {
+            var cmd = new RedisCommand(Commands.Blpop);
+            foreach(var key in keys)
+                cmd.ArgList.Add(key);
+            cmd.ArgList.Add(timeout);
+            this.SendCommand(cmd);
+            return this.ReadMultibulkResponse();
+        }
+
+        public byte[][] BRPop(byte[] timeout, params byte[][] keys)
+        {
+            var cmd = new RedisCommand(Commands.Brpop);
+            foreach (var key in keys)
+                cmd.ArgList.Add(key);
+            cmd.ArgList.Add(timeout);
+            this.SendCommand(cmd);
+            return this.ReadMultibulkResponse();
+        }
+
+        public byte[] BRPopLPush(byte[] source, byte[] destination, byte[] timeout)
+        {
+            var cmd = new RedisCommand(Commands.Brpoplpush);
+            cmd.ArgList.Add(source);
+            cmd.ArgList.Add(destination);
+            cmd.ArgList.Add(timeout);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public byte[] LIndex(byte[] key, byte[] index)
+        {
+            var cmd = new RedisCommand(Commands.Brpoplpush);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(index);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public int LInsert(byte[] key, byte[] beforeafter, byte[] pivot, byte[] value)
+        {
+            var cmd = new RedisCommand(Commands.Linsert);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(beforeafter);
+            cmd.ArgList.Add(pivot);
+            cmd.ArgList.Add(value);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int LLen(byte[] key)
+        {
+            var cmd = new RedisCommand(Commands.Llen);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public byte[] LPop(byte[] key)
+        {
+            var cmd = new RedisCommand(Commands.Lpop);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public int LPop(byte[] key, params byte[][] values)
+        {
+            var cmd = new RedisCommand(Commands.Lpop);
+            cmd.ArgList.Add(key);
+            foreach (var value in values)
+                cmd.ArgList.Add(value);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int LPushx(byte[] key, byte[] value)
+        {
+            var cmd = new RedisCommand(Commands.Lpushx);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(value);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public byte[][] LRange(byte[] key, byte[] start, byte[] stop)
+        {
+            var cmd = new RedisCommand(Commands.Linsert);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(start);
+            cmd.ArgList.Add(stop);
+            this.SendCommand(cmd);
+            return this.ReadMultibulkResponse();
+        }
+
+        public int LRem(byte[] key, byte[] count, byte[] value)
+        {
+            var cmd = new RedisCommand(Commands.Lrem);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(count);
+            cmd.ArgList.Add(value);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public string LSet(byte[] key, byte[] index, byte[] value)
+        {
+            var cmd = new RedisCommand(Commands.Lset);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(index);
+            cmd.ArgList.Add(value);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+
+        public string LTrim(byte[] key, byte[] start, byte[] stop)
+        {
+            var cmd = new RedisCommand(Commands.Ltrim);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(start);
+            cmd.ArgList.Add(stop);
+            this.SendCommand(cmd);
+            return this.ReadStringResponse();
+        }
+
+        public byte[] RPop(byte[] key)
+        {
+            var cmd = new RedisCommand(Commands.Rpop);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public byte[] RPopLPush(byte[] source, byte[] destination)
+        {
+            var cmd = new RedisCommand(Commands.Rpoplpush);
+            cmd.ArgList.Add(source);
+            cmd.ArgList.Add(destination);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public int RPush(byte[] key, params byte[][] values)
+        {
+            var cmd = new RedisCommand(Commands.Rpush);
+            cmd.ArgList.Add(key);
+            foreach(var value in values)
+                cmd.ArgList.Add(value);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int RPushX(byte[] key, byte[] value)
+        {
+            var cmd = new RedisCommand(Commands.Rpushx);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(value);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        #endregion
+
         #region Pub/Sub
         public byte[][] PSubscribe(params byte[][] patterns)
         {
@@ -597,7 +761,7 @@ namespace Batbeetle
         }
         #endregion
 
-        #region Transaction
+        #region Transactions
         public string Multi()
         {
             var cmd = new RedisCommand(Commands.Multi);
