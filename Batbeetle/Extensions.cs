@@ -32,5 +32,14 @@ namespace Batbeetle
                 sb.AppendLine(bytes.BytesToString());
             return sb.ToString();
         }
+
+        public static List<string> MultiBytesToList(this byte[][] multibytes)
+        {
+            if (multibytes == null) return new List<string>();
+            var split = multibytes.MultiBytesToString().Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var list = new List<string>();
+            list.AddRange(split);
+            return list;
+        }
     }
 }

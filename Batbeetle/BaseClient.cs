@@ -635,14 +635,14 @@ namespace Batbeetle
             return this.ReadBulkResponse();
         }
 
-        public int LPop(byte[] key, params byte[][] values)
+        public int? LPush(byte[] key, params byte[][] values)
         {
-            var cmd = new RedisCommand(Commands.Lpop);
+            var cmd = new RedisCommand(Commands.Lpush);
             cmd.ArgList.Add(key);
             foreach (var value in values)
                 cmd.ArgList.Add(value);
             this.SendCommand(cmd);
-            return this.ReadIntResponse().Value;
+            return this.ReadIntResponse();
         }
 
         public int LPushx(byte[] key, byte[] value)
@@ -656,7 +656,7 @@ namespace Batbeetle
 
         public byte[][] LRange(byte[] key, byte[] start, byte[] stop)
         {
-            var cmd = new RedisCommand(Commands.Linsert);
+            var cmd = new RedisCommand(Commands.Lrange);
             cmd.ArgList.Add(key);
             cmd.ArgList.Add(start);
             cmd.ArgList.Add(stop);
