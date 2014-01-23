@@ -87,7 +87,7 @@ namespace Batbeetle
             return this.ReadIntResponse().Value;
         }
 
-        public byte[] Keys(byte[] pattern)
+        public byte[][] Keys(byte[] pattern)
         {
             var cmd = new RedisCommand(Commands.Keys);
             cmd.ArgList.Add(pattern);
@@ -344,7 +344,7 @@ namespace Batbeetle
             return this.ReadBulkResponse();
         }
 
-        public byte[] MGet(params byte[][] keys)
+        public byte[][] MGet(params byte[][] keys)
         {
             var cmd = new RedisCommand(Commands.Mget);
             foreach(var key in keys)
@@ -453,7 +453,7 @@ namespace Batbeetle
             return this.ReadStringResponse();
         }
 
-        public byte[] HMGetAll(byte[] key)
+        public byte[][] HMGetAll(byte[] key)
         {
             var cmd = new RedisCommand(Commands.Hgetall);
             cmd.ArgList.Add(key);
@@ -464,7 +464,7 @@ namespace Batbeetle
         #endregion
 
         #region Pub/Sub
-        public byte[] PSubscribe(params byte[][] patterns)
+        public byte[][] PSubscribe(params byte[][] patterns)
         {
             var cmd = new RedisCommand(Commands.Psubscribe);
             foreach (var pattern in patterns)
@@ -482,7 +482,7 @@ namespace Batbeetle
             return this.ReadIntResponse().Value;
         }
 
-        public byte[] Subscribe(params byte[][] channels)
+        public byte[][] Subscribe(params byte[][] channels)
         {
             var cmd = new RedisCommand(Commands.Subscribe);
             foreach (var channel in channels)
@@ -500,7 +500,7 @@ namespace Batbeetle
             return this.ReadStringResponse();
         }
 
-        public byte[] Exec()
+        public byte[][] Exec()
         {
             var cmd = new RedisCommand(Commands.Exec);
             this.SendCommand(cmd);
@@ -679,33 +679,21 @@ namespace Batbeetle
             }
         }
 
-        protected internal byte[] ReadMultibulkResponse()
+        protected internal byte[][] ReadMultibulkResponse()
         {
             var lines = this.ReadIntResponse();
-            var actualines = 0;
             List<byte[]> listbytes = new List<byte[]>();
-            var totalLen = 0;
             while (lines > 0)
             {
                 var bytes = this.ReadBulkResponse();
                 if (bytes != null)
                 {
-                    totalLen += bytes.Length;
                     listbytes.Add(bytes);
-                    listbytes.Add(new byte[] { 0x0A });
-                    actualines++;
                 }
                 lines--;
             }
 
-            byte[] sum = new byte[totalLen + actualines];
-            int idx = 0;
-            listbytes.ForEach(x =>
-            {
-                x.CopyTo(sum, idx);
-                idx += x.Length;
-            });
-            return sum;
+            return listbytes.ToArray();
         }
 
         private void HandlError(string error)

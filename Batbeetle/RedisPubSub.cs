@@ -30,7 +30,7 @@ namespace Batbeetle
                 try
                 {
                     var data = this.client.ReadMultibulkResponse();
-                    var arg = new PubSubEventArgs(data);
+                    var arg = new PubSubEventArgs();
                     OnMessageReceived(this, arg);
                 }catch{}
             }

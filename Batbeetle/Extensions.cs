@@ -24,5 +24,13 @@ namespace Batbeetle
         {
             return Encoding.UTF8.GetString(bytes);
         }
+
+        public static string MultiBytesToString(this byte[][] multibytes)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var bytes in multibytes)
+                sb.AppendLine(bytes.BytesToString());
+            return sb.ToString();
+        }
     }
 }

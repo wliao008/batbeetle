@@ -133,7 +133,7 @@ namespace UnitTest
                 client.Set("four", "4");
                 var result = client.Keys("*o*".ToByte());
                 Assert.IsNotNull(result);
-                var split = result.BytesToString().Split(new char[] { '\n' });
+                var split = result.MultiBytesToString().Split(new char[] { '\r', '\n' });
                 var list = new List<string>();
                 list.AddRange(split);
                 Assert.IsTrue(list.Contains("one"));
@@ -153,7 +153,7 @@ namespace UnitTest
                 client.Set("four", "4");
                 var result = client.Keys("t??".ToByte());
                 Assert.IsNotNull(result);
-                Assert.AreEqual("two\n", result.BytesToString());
+                Assert.AreEqual("two\r\n", result.MultiBytesToString());
             }
         }
 
@@ -168,7 +168,7 @@ namespace UnitTest
                 client.Set("four", "4");
                 var result = client.Keys("*".ToByte());
                 Assert.IsNotNull(result);
-                var split = result.BytesToString().Split(new char[] { '\n' });
+                var split = result.MultiBytesToString().Split(new char[] { '\r', '\n' });
                 var list = new List<string>();
                 list.AddRange(split);
                 Assert.IsTrue(list.Contains("one"));
@@ -189,7 +189,7 @@ namespace UnitTest
                 client.Set("four", "4");
                 var result = client.Keys("nonmatching".ToByte());
                 Assert.IsNotNull(result);
-                Assert.AreEqual("", result.BytesToString());
+                Assert.AreEqual("", result.MultiBytesToString());
             }
         }
 

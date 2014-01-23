@@ -70,7 +70,7 @@ namespace Batbeetle
         public Hashtable HMGetAll(string key)
         {
             var data = base.HMGetAll(key.ToByte());
-            var str = data.BytesToString();
+            var str = data.MultiBytesToString();
             var sc = str.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             Hashtable tbl = new Hashtable();
             for (int i = 0; i < sc.Length; i += 2)

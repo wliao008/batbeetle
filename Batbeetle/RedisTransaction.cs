@@ -38,7 +38,7 @@ namespace Batbeetle
 
             var resp = this.client.Exec();
             Console.WriteLine("Exec called: ");
-            var str = resp.BytesToString();
+            var str = resp.MultiBytesToString();
             var sc = str.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var s in sc)
             {

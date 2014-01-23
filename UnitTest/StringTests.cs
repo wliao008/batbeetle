@@ -410,7 +410,7 @@ namespace UnitTest
                 client.Set("key3", "value3");
                 var result = client.MGet("key1".ToByte(), "key2".ToByte(), "key3".ToByte());
                 Assert.IsNotNull(result);
-                Assert.AreEqual("value1\nvalue2\nvalue3\n", result.BytesToString());
+                Assert.AreEqual("value1\r\nvalue2\r\nvalue3\r\n", result.MultiBytesToString());
             }
         }
 
@@ -424,7 +424,7 @@ namespace UnitTest
                 client.Set("key3", "value3");
                 var result = client.MGet("key1".ToByte(), "key2".ToByte(), "key333333".ToByte());
                 Assert.IsNotNull(result);
-                Assert.AreEqual("value1\nvalue2\n", result.BytesToString());
+                Assert.AreEqual("value1\r\nvalue2\r\n", result.MultiBytesToString());
             }
         }
 
@@ -439,7 +439,7 @@ namespace UnitTest
                 client.HMSet("mykey", tbl);
                 var result = client.MGet("mykey".ToByte()); //this op should never fail
                 Assert.IsNotNull(result);
-                Assert.AreEqual("", result.BytesToString());
+                Assert.AreEqual("", result.MultiBytesToString());
             }
         }
 
