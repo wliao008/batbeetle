@@ -732,6 +732,65 @@ namespace Batbeetle
 
         #endregion
 
+        #region Sets
+        public int SAdd(byte[] key, params byte[][] members)
+        {
+            var cmd = new RedisCommand(Commands.Sadd);
+            cmd.ArgList.Add(key);
+            foreach (var member in members)
+                cmd.ArgList.Add(member);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int SCard(byte[] key)
+        {
+            var cmd = new RedisCommand(Commands.Scard);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public byte[][] SDiff(params byte[][] keys)
+        {
+            var cmd = new RedisCommand(Commands.Sdiff);
+            foreach (var key in keys)
+                cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadMultibulkResponse();
+        }
+
+        public int SDiffStore(byte[] destination, params byte[][] keys)
+        {
+            var cmd = new RedisCommand(Commands.Sdiffstore);
+            cmd.ArgList.Add(destination);
+            foreach(var key in keys)
+                cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public byte[][] SInter(params byte[][] keys)
+        {
+            var cmd = new RedisCommand(Commands.Sinter);
+            foreach (var key in keys)
+                cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadMultibulkResponse();
+        }
+
+        public int SInterStore(byte[] destination, params byte[][] keys)
+        {
+            var cmd = new RedisCommand(Commands.Sinterstore);
+            cmd.ArgList.Add(destination);
+            foreach (var key in keys)
+                cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        #endregion
+
         #region Pub/Sub
         public byte[][] PSubscribe(params byte[][] patterns)
         {
