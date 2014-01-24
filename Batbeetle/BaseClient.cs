@@ -711,14 +711,14 @@ namespace Batbeetle
             return this.ReadBulkResponse();
         }
 
-        public int RPush(byte[] key, params byte[][] values)
+        public int? RPush(byte[] key, params byte[][] values)
         {
             var cmd = new RedisCommand(Commands.Rpush);
             cmd.ArgList.Add(key);
             foreach(var value in values)
                 cmd.ArgList.Add(value);
             this.SendCommand(cmd);
-            return this.ReadIntResponse().Value;
+            return this.ReadIntResponse();
         }
 
         public int RPushX(byte[] key, byte[] value)
