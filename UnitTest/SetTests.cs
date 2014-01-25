@@ -376,5 +376,51 @@ namespace UnitTest
                 Assert.AreEqual(0, list.Count);
             }
         }
+
+        [TestMethod]
+        public void SRem_KeyExistsMembersExists_ShouldRemoveMembers()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.SAdd("myset".ToByte(), "one".ToByte(), "two".ToByte(), "three".ToByte());
+                client.SAdd("myset".ToByte(), "four".ToByte(), "five".ToByte(), "six".ToByte());
+                var result = client.SRem("myset".ToByte(), "five".ToByte(), "six".ToByte());
+                Assert.IsNotNull(result);
+                Assert.AreEqual(2, result);
+            }
+        }
+
+        [TestMethod]
+        public void SRem_KeyExistsMembersNotExists_ShouldOnlyRemoveExistingMembers()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.SAdd("myset".ToByte(), "one".ToByte(), "two".ToByte(), "three".ToByte());
+                client.SAdd("myset".ToByte(), "four".ToByte(), "five".ToByte(), "six".ToByte());
+                var result = client.SRem("myset".ToByte(), "five".ToByte(), "seven".ToByte());
+                Assert.AreEqual(1, result);
+            }
+        }
+
+        [TestMethod]
+        public void SRem_KeyNotExists_ShouldReturnZero()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.SRem("myset".ToByte(), "five".ToByte(), "seven".ToByte());
+                Assert.AreEqual(0, result);
+            }
+        }
+
+        [TestMethod]
+        public void SRem_WrongDataType_ShouldReturnNil()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("myset", "val");
+                var result = client.SRem("myset".ToByte(), "five".ToByte(), "seven".ToByte());
+                Assert.IsNull(result);
+            }
+        }
     }
 }

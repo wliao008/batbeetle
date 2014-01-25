@@ -843,6 +843,16 @@ namespace Batbeetle
                 return bytes;
             }
         }
+
+        public int? SRem(byte[] key, params byte[][] members)
+        {
+            var cmd = new RedisCommand(Commands.Srem);
+            cmd.ArgList.Add(key);
+            foreach(var member in members)
+                cmd.ArgList.Add(member);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse();
+        }
         #endregion
 
         #region Pub/Sub
