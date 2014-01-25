@@ -179,5 +179,202 @@ namespace UnitTest
                 Assert.AreEqual(1, result);
             }
         }
+
+        [TestMethod]
+        public void SIsMember_KeyExistsMemberExists_ShouldReturnOne()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.SAdd("myset".ToByte(), "Hello".ToByte());
+                var result = client.SIsMember("myset".ToByte(), "Hello".ToByte());
+                Assert.AreEqual(1, result);
+            }
+        }
+
+        [TestMethod]
+        public void SIsMember_KeyExistsMemberNotExists_ShouldReturnZero()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.SAdd("myset".ToByte(), "Hello".ToByte());
+                var result = client.SIsMember("myset".ToByte(), "World".ToByte());
+                Assert.AreEqual(0, result);
+            }
+        }
+
+        [TestMethod]
+        public void SIsMember_KeyNotExists_ShouldReturnZero()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.SIsMember("myset".ToByte(), "Hello".ToByte());
+                Assert.AreEqual(0, result);
+            }
+        }
+
+        [TestMethod]
+        public void SMembers_KeyExists_ShouldReturnAllMembers()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.SAdd("myset".ToByte(), "Hello".ToByte(), "World".ToByte());
+                var result = client.SMembers("myset".ToByte());
+                Assert.IsNotNull(result);
+                var list = result.MultiBytesToList();
+                Assert.AreEqual(2, list.Count);
+                Assert.IsTrue(list.Contains("Hello"));
+                Assert.IsTrue(list.Contains("World"));
+            }
+        }
+
+        [TestMethod]
+        public void SMembers_KeyNotExists_ShouldReturnEmpty()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.SMembers("myset".ToByte());
+                Assert.IsNotNull(result);
+                var list = result.MultiBytesToList();
+                Assert.AreEqual(0, list.Count);
+            }
+        }
+
+        [TestMethod]
+        public void SMove_SourceNotExists_ShouldDoNothing()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.SMove("source".ToByte(), "dest".ToByte(), "mem".ToByte());
+                Assert.AreEqual(0, result);
+            }
+        }
+
+        [TestMethod]
+        public void SMove_SourceExistsMemberNotExist_ShouldDoNothingAndReturnZero()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.SAdd("source".ToByte(), "Hello".ToByte());
+                var result = client.SMove("source".ToByte(), "dest".ToByte(), "mem".ToByte());
+                Assert.AreEqual(0, result);
+            }
+        }
+
+        [TestMethod]
+        public void SMove_SourceDestinationExist_ShouldMoveElement()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.SAdd("source".ToByte(), "Hello".ToByte());
+                client.SAdd("destination".ToByte(), "World".ToByte());
+                var result = client.SMove("source".ToByte(), "destination".ToByte(), "Hello".ToByte());
+                Assert.AreEqual(1, result);
+                result = client.SCard("source".ToByte());
+                Assert.AreEqual(0, result);
+                result = client.SCard("destination".ToByte());
+                Assert.AreEqual(2, result);
+            }
+        }
+
+        [TestMethod]
+        public void SMove_SourceDestinationMemberExist_ShouldJustRemoveElementFromSource()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.SAdd("source".ToByte(), "World".ToByte());
+                client.SAdd("destination".ToByte(), "World".ToByte());
+                var result = client.SMove("source".ToByte(), "destination".ToByte(), "World".ToByte());
+                Assert.AreEqual(1, result);
+                result = client.SCard("source".ToByte());
+                Assert.AreEqual(0, result);
+                result = client.SCard("destination".ToByte());
+                Assert.AreEqual(1, result);
+            }
+        }
+
+        [TestMethod]
+        public void SMove_WrontDataType_ShouldReturnNil()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("source", "source");
+                client.Set("destination", "destination");
+                var result = client.SMove("source".ToByte(), "destination".ToByte(), "World".ToByte());
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void SPop_SetExists_ShouldRemoveAndReturnRandomElement()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.SAdd("myset".ToByte(), "one".ToByte(), "two".ToByte(), "three".ToByte());
+                var result = client.SPop("myset".ToByte());
+                Assert.IsNotNull(result);
+                var num = client.SCard("myset".ToByte());
+                Assert.AreEqual(2, num);
+            }
+        }
+
+        [TestMethod]
+        public void SPop_SetNotExists_ShouldReturnNil()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.SPop("myset".ToByte());
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void SRandMember_KeyExists_ShouldReturnRandomElement()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.SAdd("myset".ToByte(), "one".ToByte(), "two".ToByte(), "three".ToByte());
+                var result = client.SRandMember("myset".ToByte(), null);
+                Assert.IsNotNull(result);
+                var num = client.SCard("myset".ToByte());
+                Assert.AreEqual(3, num);
+            }
+        }
+
+        [TestMethod]
+        public void SRandMember_KeyExistsWithCount_ShouldReturnCountRandomElement()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.SAdd("myset".ToByte(), "one".ToByte(), "two".ToByte(), "three".ToByte());
+                var result = client.SRandMember("myset".ToByte(), "2".ToByte());
+                Assert.IsNotNull(result);
+                var list = result.MultiBytesToList();
+                Assert.AreEqual(2, list.Count);
+                var num = client.SCard("myset".ToByte());
+                Assert.AreEqual(3, num);
+            }
+        }
+
+        [TestMethod]
+        public void SRandMember_KeyNotExists_ShouldReturnEmpty()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.SRandMember("myset".ToByte(), null);
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void SRandMember_KeyNotExistsWithCount_ShouldReturnEmptyList()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.SRandMember("myset".ToByte(), "2".ToByte());
+                Assert.IsNotNull(result);
+                var list = result.MultiBytesToList();
+                Assert.AreEqual(0, list.Count);
+            }
+        }
     }
 }

@@ -789,6 +789,60 @@ namespace Batbeetle
             return this.ReadIntResponse().Value;
         }
 
+        public int SIsMember(byte[] key, byte[] member)
+        {
+            var cmd = new RedisCommand(Commands.Sismember);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(member);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public byte[][] SMembers(byte[] key)
+        {
+            var cmd = new RedisCommand(Commands.Smembers);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadMultibulkResponse();
+        }
+
+        public int? SMove(byte[] source, byte[] destination, byte[] member)
+        {
+            var cmd = new RedisCommand(Commands.Smove);
+            cmd.ArgList.Add(source);
+            cmd.ArgList.Add(destination);
+            cmd.ArgList.Add(member);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse();
+        }
+
+        public byte[] SPop(byte[] key)
+        {
+            var cmd = new RedisCommand(Commands.Spop);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public byte[][] SRandMember(byte[] key, byte[] count)
+        {
+            var cmd = new RedisCommand(Commands.Srandmember);
+            cmd.ArgList.Add(key);
+            if (count != null)
+                cmd.ArgList.Add(count);
+            this.SendCommand(cmd);
+            if (count != null)
+                return this.ReadMultibulkResponse();
+            else
+            {
+                var result = this.ReadBulkResponse();
+                if (result == null)
+                    return null;
+                var bytes = new byte[1][];
+                bytes[0] = result;
+                return bytes;
+            }
+        }
         #endregion
 
         #region Pub/Sub
