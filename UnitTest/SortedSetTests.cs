@@ -410,5 +410,114 @@ namespace UnitTest
                 Assert.AreEqual(0, list.Count);
             }
         }
+
+        [TestMethod]
+        public void ZRank_KeyMemberExist_ReturnRank()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var scores = new byte[3][];
+                var members = new byte[3][];
+                scores[0] = "1".ToByte();
+                scores[1] = "2".ToByte();
+                scores[2] = "3".ToByte();
+                members[0] = "one".ToByte();
+                members[1] = "two".ToByte();
+                members[2] = "three".ToByte();
+                client.ZAdd("key".ToByte(), scores, members);
+                var result = client.ZRank("key".ToByte(), "two".ToByte());
+                Assert.IsNotNull(result);
+                Assert.AreEqual(1, result);
+            }
+        }
+
+        [TestMethod]
+        public void ZRank_KeyExistMemberNotExist_ReturnNil()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var scores = new byte[3][];
+                var members = new byte[3][];
+                scores[0] = "1".ToByte();
+                scores[1] = "2".ToByte();
+                scores[2] = "3".ToByte();
+                members[0] = "one".ToByte();
+                members[1] = "two".ToByte();
+                members[2] = "three".ToByte();
+                client.ZAdd("key".ToByte(), scores, members);
+                var result = client.ZRank("key".ToByte(), "four".ToByte());
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void ZRank_KeyNotExistMemberNotExist_ReturnNil()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.ZRank("key".ToByte(), "four".ToByte());
+                Assert.IsNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void ZRem_KeyExistsMembersExists_ShouldRemoveMembers()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var scores = new byte[3][];
+                var members = new byte[3][];
+                scores[0] = "1".ToByte();
+                scores[1] = "2".ToByte();
+                scores[2] = "3".ToByte();
+                members[0] = "one".ToByte();
+                members[1] = "two".ToByte();
+                members[2] = "three".ToByte();
+                client.ZAdd("key".ToByte(), scores, members);
+                var result = client.ZRem("key".ToByte(), "one".ToByte(), "two".ToByte());
+                Assert.IsNotNull(result);
+                Assert.AreEqual(2, result);
+            }
+        }
+
+        [TestMethod]
+        public void ZRem_KeyExistsMembersNotExists_ShouldOnlyRemoveExistingMembers()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var scores = new byte[3][];
+                var members = new byte[3][];
+                scores[0] = "1".ToByte();
+                scores[1] = "2".ToByte();
+                scores[2] = "3".ToByte();
+                members[0] = "one".ToByte();
+                members[1] = "two".ToByte();
+                members[2] = "three".ToByte();
+                client.ZAdd("key".ToByte(), scores, members);
+                var result = client.ZRem("key".ToByte(), "six".ToByte(), "seven".ToByte());
+                Assert.AreEqual(0, result);
+            }
+        }
+
+        [TestMethod]
+        public void ZRem_KeyNotExists_ShouldReturnZero()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.ZRem("key".ToByte(), "five".ToByte(), "seven".ToByte());
+                Assert.AreEqual(0, result);
+            }
+        }
+
+        [TestMethod]
+        public void ZRem_WrongDataType_ShouldReturnNil()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("key", "val");
+                var result = client.ZRem("key".ToByte(), "five".ToByte(), "seven".ToByte());
+                Assert.IsNull(result);
+            }
+        }
     }
 }

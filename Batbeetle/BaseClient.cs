@@ -948,6 +948,28 @@ namespace Batbeetle
             this.SendCommand(cmd);
             return this.ReadMultibulkResponse();
         }
+
+        public int? ZRank(byte[] key, byte[] member)
+        {
+            var cmd = new RedisCommand(Commands.Zrank);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(member);
+            this.SendCommand(cmd);
+            var result = this.ReadIntResponse();
+            if (result == -1)
+                return null;
+            return result;
+        }
+
+        public int? ZRem(byte[] key, params byte[][] members)
+        {
+            var cmd = new RedisCommand(Commands.Zrem);
+            cmd.ArgList.Add(key);
+            foreach(var member in members)
+                cmd.ArgList.Add(member);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse();;
+        }
         #endregion
 
         #region Pub/Sub
