@@ -853,6 +853,25 @@ namespace Batbeetle
             this.SendCommand(cmd);
             return this.ReadIntResponse();
         }
+
+        public byte[][] SUnion(params byte[][] keys)
+        {
+            var cmd = new RedisCommand(Commands.Sunion);
+            foreach(var key in keys)
+                cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadMultibulkResponse();
+        }
+
+        public int SUnionStore(byte[] destination, params byte[][] keys)
+        {
+            var cmd = new RedisCommand(Commands.Sunionstore);
+            cmd.ArgList.Add(destination);
+            foreach (var key in keys)
+                cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
         #endregion
 
         #region Pub/Sub

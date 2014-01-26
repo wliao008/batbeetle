@@ -422,5 +422,56 @@ namespace UnitTest
                 Assert.IsNull(result);
             }
         }
+
+        [TestMethod]
+        public void SUnion_ValidKeys_ShouldReturnMembersOfUnion()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.SAdd("key1".ToByte(), "a".ToByte(), "b".ToByte(), "c".ToByte());
+                client.SAdd("key2".ToByte(), "c".ToByte(), "d".ToByte(), "e".ToByte());
+                var result = client.SUnion("key1".ToByte(), "key2".ToByte());
+                Assert.IsNotNull(result);
+                var list = result.MultiBytesToList();
+                Assert.AreEqual(5, list.Count);
+            }
+        }
+
+        [TestMethod]
+        public void SUnion_InValidKeys_ShouldReturnEmpty()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.SUnion("key1".ToByte(), "key2".ToByte());
+                Assert.IsNotNull(result);
+                var list = result.MultiBytesToList();
+                Assert.AreEqual(0, list.Count);
+            }
+        }
+
+        [TestMethod]
+        public void SUnionStore_ValidKeys_ShouldStoreResultingUnion()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.SAdd("key1".ToByte(), "a".ToByte(), "b".ToByte(), "c".ToByte());
+                client.SAdd("key2".ToByte(), "c".ToByte(), "d".ToByte(), "e".ToByte());
+                var result = client.SUnionStore("newkey".ToByte(), "key1".ToByte(), "key2".ToByte());
+                Assert.AreEqual(5, result);
+            }
+        }
+
+        [TestMethod]
+        public void SUnionStore_DestinationExist_ShouldOverwriteDesintation()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.SAdd("key1".ToByte(), "a".ToByte(), "b".ToByte(), "c".ToByte());
+                client.SAdd("key2".ToByte(), "c".ToByte(), "d".ToByte(), "e".ToByte());
+                client.SAdd("newkey".ToByte(), "f".ToByte());
+                var result = client.SUnionStore("newkey".ToByte(), "key1".ToByte(), "key2".ToByte());
+                Assert.AreEqual(5, result);
+            }
+        }
     }
 }
