@@ -55,6 +55,7 @@
     <Compile Include="ListTests.cs" />
     <Compile Include="PubsubTests.cs" />
     <Compile Include="SetTests.cs" />
+    <Compile Include="SortedSetTests.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="HashTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

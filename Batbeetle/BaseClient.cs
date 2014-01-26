@@ -874,6 +874,42 @@ namespace Batbeetle
         }
         #endregion
 
+        #region Sorted Sets
+        public int? ZAdd(byte[] key, byte[][] scores, byte[][] members)
+        {
+            if (scores.Length != members.Length)
+                return null;
+
+            var cmd = new RedisCommand(Commands.Zadd);
+            cmd.ArgList.Add(key);
+            for (int i = 0; i < scores.Length; ++i)
+            {
+                cmd.ArgList.Add(scores[i]);
+                cmd.ArgList.Add(members[i]);
+            }
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int ZCard(byte[] key)
+        {
+            var cmd = new RedisCommand(Commands.Zcard);
+            cmd.ArgList.Add(key);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+
+        public int ZCount(byte[] key, byte[] min, byte[] max)
+        {
+            var cmd = new RedisCommand(Commands.Zcount);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(min);
+            cmd.ArgList.Add(max);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse().Value;
+        }
+        #endregion
+
         #region Pub/Sub
         public byte[][] PSubscribe(params byte[][] patterns)
         {
