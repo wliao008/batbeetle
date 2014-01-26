@@ -137,5 +137,45 @@ namespace UnitTest
                 Assert.AreEqual(3, result);
             }
         }
+
+        [TestMethod]
+        public void ZIncrBy_KeyExists_IncrementScoreOfMemberBySpecified()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var scores = new byte[3][];
+                var members = new byte[3][];
+                scores[0] = "1".ToByte();
+                scores[1] = "2".ToByte();
+                scores[2] = "3".ToByte();
+                members[0] = "one".ToByte();
+                members[1] = "two".ToByte();
+                members[2] = "three".ToByte();
+                client.ZAdd("key".ToByte(), scores, members);
+                var result = client.ZIncrBy("key".ToByte(), "2".ToByte(), "one".ToByte());
+                Assert.AreEqual("3", result.BytesToString());
+            }
+        }
+
+        [TestMethod]
+        public void ZIncrBy_KeyNotExists_CreateThenIncrementScoreOfMemberBySpecified()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.ZIncrBy("key".ToByte(), "2".ToByte(), "one".ToByte());
+                Assert.AreEqual("2", result.BytesToString());
+            }
+        }
+
+        [TestMethod]
+        public void ZIncrBy_WrongDateType_ShouldReturnNil()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.Set("key", "val");
+                var result = client.ZIncrBy("key".ToByte(), "2".ToByte(), "one".ToByte());
+                Assert.IsNull(result);
+            }
+        }
     }
 }

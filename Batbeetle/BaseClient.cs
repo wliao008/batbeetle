@@ -908,6 +908,16 @@ namespace Batbeetle
             this.SendCommand(cmd);
             return this.ReadIntResponse().Value;
         }
+
+        public byte[] ZIncrBy(byte[] key, byte[] increment, byte[] member)
+        {
+            var cmd = new RedisCommand(Commands.Zincrby);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(increment);
+            cmd.ArgList.Add(member);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
         #endregion
 
         #region Pub/Sub
