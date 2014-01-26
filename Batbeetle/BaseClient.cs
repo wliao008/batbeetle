@@ -918,6 +918,36 @@ namespace Batbeetle
             this.SendCommand(cmd);
             return this.ReadBulkResponse();
         }
+
+        public byte[][] ZRange(byte[] key, byte[] start, byte[] stop, bool withScores = false)
+        {
+            var cmd = new RedisCommand(Commands.Zrange);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(start);
+            cmd.ArgList.Add(stop);
+            if (withScores)
+                cmd.ArgList.Add("WITHSCORES".ToByte());
+            this.SendCommand(cmd);
+            return this.ReadMultibulkResponse();
+        }
+
+        public byte[][] ZRangeByScore(byte[] key, byte[] min, byte[] max, bool withScores = false, bool limit = false, byte[] offset = null, byte[] count = null)
+        {
+            var cmd = new RedisCommand(Commands.Zrangebyscore);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(min);
+            cmd.ArgList.Add(max);
+            if (withScores)
+                cmd.ArgList.Add("WITHSCORES".ToByte());
+            if (limit)
+            {
+                cmd.ArgList.Add("LIMIT".ToByte());
+                cmd.ArgList.Add(offset);
+                cmd.ArgList.Add(count);
+            }
+            this.SendCommand(cmd);
+            return this.ReadMultibulkResponse();
+        }
         #endregion
 
         #region Pub/Sub
