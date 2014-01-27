@@ -970,6 +970,111 @@ namespace Batbeetle
             this.SendCommand(cmd);
             return this.ReadIntResponse();;
         }
+
+        public int? ZRemRangeByRank(byte[] key, byte[] start, byte[] stop)
+        {
+            var cmd = new RedisCommand(Commands.Zremrangebyrank);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(start);
+            cmd.ArgList.Add(stop);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse(); ;
+        }
+
+        public int? ZRemRangeByScore(byte[] key, byte[] min, byte[] max)
+        {
+            var cmd = new RedisCommand(Commands.Zremrangebyscore);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(min);
+            cmd.ArgList.Add(max);
+            this.SendCommand(cmd);
+            return this.ReadIntResponse(); ;
+        }
+
+        public byte[][] ZRevRange(byte[] key, byte[] start, byte[] stop, bool withScores = false)
+        {
+            var cmd = new RedisCommand(Commands.Zrevrange);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(start);
+            cmd.ArgList.Add(stop);
+            if (withScores)
+                cmd.ArgList.Add("WITHSCORES".ToByte());
+            this.SendCommand(cmd);
+            return this.ReadMultibulkResponse();
+        }
+
+        public byte[][] ZRevRangeByScore(byte[] key, byte[] max, byte[] min, bool withScores = false, bool limit = false, byte[] offset = null, byte[] count = null)
+        {
+            var cmd = new RedisCommand(Commands.Zrevrangebyscore);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(max);
+            cmd.ArgList.Add(min);
+            if (withScores)
+                cmd.ArgList.Add("WITHSCORES".ToByte());
+            if (limit)
+            {
+                cmd.ArgList.Add("LIMIT".ToByte());
+                cmd.ArgList.Add(offset);
+                cmd.ArgList.Add(count);
+            }
+            this.SendCommand(cmd);
+            return this.ReadMultibulkResponse();
+        }
+
+        public int? ZRevRank(byte[] key, byte[] member)
+        {
+            var cmd = new RedisCommand(Commands.Zrevrank);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(member);
+            this.SendCommand(cmd);
+            var result = this.ReadIntResponse();
+            if (result == -1)
+                return null;
+            return result;
+        }
+
+        public byte[] ZScore(byte[] key, byte[] member)
+        {
+            var cmd = new RedisCommand(Commands.Zscore);
+            cmd.ArgList.Add(key);
+            cmd.ArgList.Add(member);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+
+        public int? ZUnionStore(
+            byte[] destination, 
+            byte[] numkeys,
+            byte[][] keys,
+            bool getWeights = false,
+            byte[][] weights = null,
+            bool getAggregate = false,
+            byte[] aggregateType = null)
+        {
+            var cmd = new RedisCommand(Commands.Zunionstore);
+            cmd.ArgList.Add(destination);
+            cmd.ArgList.Add(numkeys);
+            foreach (var key in keys)
+                cmd.ArgList.Add(key);
+            if (getWeights)
+            {
+                cmd.ArgList.Add("WEIGHTS".ToByte());
+                foreach (var weight in weights)
+                    cmd.ArgList.Add(weight);
+            }
+            if (getAggregate)
+            {
+                cmd.ArgList.Add("AGGREGATE".ToByte());
+                if (aggregateType == null)
+                    aggregateType = "SUM".ToByte();
+                cmd.ArgList.Add(aggregateType);
+            }
+            this.SendCommand(cmd);
+            var result = this.ReadIntResponse();
+            if (result == -1)
+                return null;
+            return result;
+        }
         #endregion
 
         #region Pub/Sub
