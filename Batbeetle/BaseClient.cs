@@ -1219,15 +1219,35 @@ namespace Batbeetle
         #region Parsing response
         private string ReadLine()
         {
-            var sb = new StringBuilder();
-            int c;
-            while ((c = bs.ReadByte()) != -1)
+            if (this.Socket == null)
+                return null;
+
+            try
             {
-                if (c == '\r') continue;
-                if (c == '\n') break;
-                sb.Append((char)c);
+                var sb = new StringBuilder();
+                int c;
+                while ((c = bs.ReadByte()) != -1)
+                {
+                    if (c == '\r') continue;
+                    if (c == '\n') break;
+                    sb.Append((char)c);
+                }
+                return sb.ToString();
             }
-            return sb.ToString();
+            catch
+            {
+                return null;
+            }
+        }
+
+        public bool IsConnected()
+        {
+            bool part1 = this.Socket.Poll(1000, SelectMode.SelectRead);
+            bool part2 = (this.Socket.Available == 0);
+            if (part1 & part2)
+                return false;
+            else
+                return true;
         }
 
         public int Available()
@@ -1238,9 +1258,7 @@ namespace Batbeetle
         private string ReadStringResponse()
         {
             var str = this.ReadLine();
-            if (string.IsNullOrEmpty(str))
-                throw new Exception("Response is empty");
-            if (str[0] == '-')
+            if (string.IsNullOrEmpty(str) || str[0] == '-')
             {
                 HandlError(str);
                 return null;
