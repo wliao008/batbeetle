@@ -277,11 +277,6 @@ namespace Batbeetle
             return this.ReadIntResponse();
         }
 
-        public string Set(byte[] key, byte[] value)
-        {
-            return this.Set(key, value, null, null, false, false);
-        }
-
         public byte[] Get(byte[] key)
         {
             var cmd = new RedisCommand(Commands.Get);
@@ -383,7 +378,12 @@ namespace Batbeetle
             return this.ReadIntResponse().Value;
         }
 
-        public string Set(byte[] key, byte[] value, byte[] ex, byte[] px, bool nx, bool xx)
+        protected string Set(byte[] key, byte[] value)
+        {
+            return this.Set(key, value, null, null, false, false);
+        }
+
+        protected string Set(byte[] key, byte[] value, byte[] ex, byte[] px, bool nx, bool xx)
         {
             var cmd = new RedisCommand(Commands.Set);
             cmd.ArgList.Add(key);
@@ -1163,7 +1163,7 @@ namespace Batbeetle
             return this.ReadBulkResponse();
         }
 
-        public string Ping()
+        protected string Ping()
         {
             var cmd = new RedisCommand(Commands.Ping);
             this.SendCommand(cmd);
@@ -1279,7 +1279,7 @@ namespace Batbeetle
         private byte[] ReadBulkResponse()
         {
             var str = this.ReadLine();
-            if (str == "$-1") return null;
+            if (str == null || str == "$-1") return null;
             if (str[0] == '-')
             {
                 HandlError(str);

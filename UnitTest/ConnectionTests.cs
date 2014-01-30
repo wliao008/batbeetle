@@ -48,5 +48,24 @@ namespace UnitTest
                 Assert.AreEqual("value", result);
             }
         }
+
+        [TestMethod]
+        public void Ping_ConnectedToServer_ShouldReturnTrue()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                var result = client.Ping();
+                Assert.IsTrue(result);
+            }
+        }
+
+        [TestMethod]
+        public void Ping_NotConnectedToServer_ShouldReturnFalse()
+        {
+            var client = new RedisClient(this.Host);
+            client.Quit();
+            var result = client.Ping();
+            Assert.IsFalse(result);
+        }
     }
 }

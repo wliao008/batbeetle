@@ -11,23 +11,37 @@ namespace Batbeetle
         {
         }
 
-        public void Set(string key, string value)
+        #region Connection
+        public new bool Ping()
         {
-            base.Set(Encoding.UTF8.GetBytes(key),
-                Encoding.UTF8.GetBytes(value));
+            var result = base.Ping();
+            if (result == null) return false;
+            return result.Equals("PONG");
+        }
+        #endregion
+
+        #region Strings
+        public bool Set(string key, string value)
+        {
+            var result = base.Set(Encoding.UTF8.GetBytes(key), Encoding.UTF8.GetBytes(value));
+            if (result == null) return false;
+            return result.Equals("OK");
         }
 
-        public void Set(string key, string value, int expireInSec)
+        public bool Set(string key, string value, int expireInSec)
         {
-            base.Set(Encoding.UTF8.GetBytes(key),
+            var result = base.Set(
+                Encoding.UTF8.GetBytes(key),
                 Encoding.UTF8.GetBytes(value),
                 Encoding.UTF8.GetBytes(expireInSec.ToString()),
                 null,
                 false,
                 false);
+            if (result == null) return false;
+            return result.Equals("OK");
         }
 
-        public void Set(
+        public bool Set(
             string key, 
             string value, 
             int? expireInSec, 
@@ -35,13 +49,15 @@ namespace Batbeetle
             bool setIfNotExist,
             bool setIfExist)
         {
-            base.Set(
+            var result = base.Set(
                 Encoding.UTF8.GetBytes(key),
                 Encoding.UTF8.GetBytes(value),
                 expireInSec.HasValue ? Encoding.UTF8.GetBytes(expireInSec.Value.ToString()) : null,
                 expireInMillisec.HasValue ? Encoding.UTF8.GetBytes(expireInMillisec.ToString()) : null,
                 setIfNotExist,
                 setIfExist);
+            if (result == null) return false;
+            return result.Equals("OK");
         }
 
         public string Get(string key)
@@ -50,6 +66,7 @@ namespace Batbeetle
             if (bytes == null) return null;
             return Encoding.UTF8.GetString(bytes);
         }
+        #endregion
 
         public void HMSet(string key, Hashtable hash)
         {

@@ -512,11 +512,21 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "myvalue");
+                var setResult = client.Set("mykey", "myvalue");
+                Assert.IsTrue(setResult);
                 var result = client.Get("mykey");
                 Assert.IsNotNull(result);
                 Assert.AreEqual("myvalue", result);
             }
+        }
+
+        [TestMethod]
+        public void Set_ValidKeyValueButNoConnection_ShouldFail()
+        {
+            var client = new RedisClient(this.Host);
+            client.Quit();
+            var setResult = client.Set("mykey", "myvalue");
+            Assert.IsFalse(setResult);
         }
 
         [TestMethod]
