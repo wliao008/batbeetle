@@ -33,14 +33,14 @@ namespace UnitTest
                     };
                     pubsub.OnMessageReceived += (s2, e2) =>
                     {
-                        System.Diagnostics.Debug.WriteLine("Msg rec'd");
-                        System.Diagnostics.Debug.WriteLine(e2.Message.MultiBytesToString());
+                        //System.Diagnostics.Debug.WriteLine("Msg rec'd");
+                        //System.Diagnostics.Debug.WriteLine(e2.Message.MultiBytesToString());
                         Assert.IsNotNull(e2.Message);
-                        Assert.AreEqual("message\r\nfoo\r\nhello\r\n", e2.Message.MultiBytesToString());
+                        Assert.AreEqual("hello\r\n", e2.Message.MessageData);
                         client.Quit();
                     };
 
-                    pubsub.SubscribeToChannel("foo");
+                    pubsub.SubscribeToChannel("foo", "bar");
                 }
             };
 

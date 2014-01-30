@@ -27,27 +27,25 @@ namespace Batbeetle
             {
                 subscriberCount += channels.Length;
             }
+
             var cmd = new RedisCommand(Commands.Subscribe);
             foreach(var channel in channels)
                 cmd.ArgList.Add(channel.ToByte());
             this.client.SendCommand(cmd);
-            if (OnSubscribed != null)
-                OnSubscribed(this, new PubSubEventArgs());
-            var subdata = this.client.ReadMultibulkResponse();
-            var arg = new PubSubEventArgs(subdata);
-            //OnMessageReceived(this, arg);
+
+            foreach (var ch in channels)
+            {
+                var subdata = this.client.ReadMultibulkResponse();
+                if (OnSubscribed != null)
+                    OnSubscribed(this, new PubSubEventArgs(subdata));
+            }
 
             while (subscriberCount > 0 && this.client.IsConnected())
             {
-                try
-                {
-                    Console.WriteLine("subscribe count > 0 and is connected");
-                    var recdata = this.client.ReadMultibulkResponse();
-                    arg = new PubSubEventArgs(recdata);
-                    if (OnMessageReceived != null)
-                        OnMessageReceived(this, arg);
-                }
-                catch { }
+                var recdata = this.client.ReadMultibulkResponse();
+                var arg = new PubSubEventArgs(recdata);
+                if (OnMessageReceived != null)
+                    OnMessageReceived(this, arg);
             }
         }
 
@@ -56,28 +54,65 @@ namespace Batbeetle
             lock (locker)
             {
                 subscriberCount--;
-                Console.WriteLine("subscribe count = 0");
-                var cmd = new RedisCommand(Commands.Unsubscribe);
-                foreach (var channel in channels)
-                    cmd.ArgList.Add(channel.ToByte());
-                this.client.SendCommand(cmd);
+            }
+            var cmd = new RedisCommand(Commands.Unsubscribe);
+            foreach (var channel in channels)
+                cmd.ArgList.Add(channel.ToByte());
+            this.client.SendCommand(cmd);
+            foreach (var ch in channels)
+            {
+                var unsubdata = this.client.ReadMultibulkResponse();
                 if (OnUnsubscribed != null)
-                    OnUnsubscribed(this, new PubSubEventArgs());
-                var recdata = this.client.ReadMultibulkResponse();
-                var arg = new PubSubEventArgs(recdata);
-                if (OnMessageReceived != null)
-                    OnMessageReceived(this, arg);
+                    OnUnsubscribed(this, new PubSubEventArgs(unsubdata));
             }
         }
     }
 
     public class PubSubEventArgs : EventArgs
     {
-        public byte[][] Message { get; set; }
-        public PubSubEventArgs() { }
-        public PubSubEventArgs(byte[][] msg)
+        public Message Message { get; set; }
+        public PubSubEventArgs(byte[][] data)
         {
-            this.Message = msg;
+            if (data != null)
+            {
+                this.Message = this.ParseMessage(data);
+            }
         }
+
+        private Message ParseMessage(byte[][] data)
+        {
+            var result = data.MultiBytesToList();
+            var msg = new Message();
+            switch (result[0])
+            {
+                case "subscribe":
+                    msg.MessageType = Batbeetle.MessageType.Subscribe;
+                    break;
+                case "unsubscribe":
+                    msg.MessageType = Batbeetle.MessageType.Unsubscribe;
+                    break;
+                case "message":
+                    msg.MessageType = Batbeetle.MessageType.Message;
+                    break;
+            }
+
+            msg.Channel = result[1];
+            msg.MessageData = result[2];
+            return msg;
+        }
+    }
+
+    public enum MessageType
+    {
+        Subscribe,
+        Unsubscribe,
+        Message
+    }
+
+    public class Message
+    {
+        public string MessageData { get; set; }
+        public MessageType MessageType { get; set; }
+        public string Channel { get; set; }
     }
 }
