@@ -25,7 +25,7 @@ namespace UnitTest
             {
                 using (var client = new RedisClient(this.Host))
                 {
-                    var pubsub = new RedisPubSub(client);
+                    var pubsub = new Subscription(client);
                     pubsub.OnSubscribed += (s1, e1) =>
                     {
                         System.Diagnostics.Debug.WriteLine("Subscribed!");

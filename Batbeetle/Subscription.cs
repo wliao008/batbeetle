@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace Batbeetle
 {
-    public class RedisPubSub
+    public class Subscription
     {
-        public delegate void EventHandler(object sender, PubSubEventArgs e);
+        public delegate void EventHandler(object sender, SubscriptionEventArgs e);
         public event EventHandler OnSubscribed, OnUnsubscribed;
         public event EventHandler OnMessageReceived;
         private RedisClient client;
         private static int subscriberCount;
         private static object locker = new object();
 
-        public RedisPubSub(RedisClient client)
+        public Subscription(RedisClient client)
         {
             this.client = client;
         }
@@ -37,13 +37,13 @@ namespace Batbeetle
             {
                 var subdata = this.client.ReadMultibulkResponse();
                 if (OnSubscribed != null)
-                    OnSubscribed(this, new PubSubEventArgs(subdata));
+                    OnSubscribed(this, new SubscriptionEventArgs(subdata));
             }
 
             while (subscriberCount > 0 && this.client.IsConnected())
             {
                 var recdata = this.client.ReadMultibulkResponse();
-                var arg = new PubSubEventArgs(recdata);
+                var arg = new SubscriptionEventArgs(recdata);
                 if (OnMessageReceived != null)
                     OnMessageReceived(this, arg);
             }
@@ -63,15 +63,15 @@ namespace Batbeetle
             {
                 var unsubdata = this.client.ReadMultibulkResponse();
                 if (OnUnsubscribed != null)
-                    OnUnsubscribed(this, new PubSubEventArgs(unsubdata));
+                    OnUnsubscribed(this, new SubscriptionEventArgs(unsubdata));
             }
         }
     }
 
-    public class PubSubEventArgs : EventArgs
+    public class SubscriptionEventArgs : EventArgs
     {
         public Message Message { get; set; }
-        public PubSubEventArgs(byte[][] data)
+        public SubscriptionEventArgs(byte[][] data)
         {
             if (data != null)
             {
