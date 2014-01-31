@@ -34,16 +34,16 @@ namespace UnitTest
                 var selectResult = client.Select("1".ToByte());
                 Assert.IsNotNull(selectResult);
                 Assert.AreEqual("OK", selectResult);
-                client.Set("mykey", "value");
+                client.Strings.Set("mykey", "value");
                 selectResult = client.Select("0".ToByte());
                 Assert.IsNotNull(selectResult);
                 Assert.AreEqual("OK", selectResult);
-                var result = client.Get("mykey");
+                var result = client.Strings.Get("mykey");
                 Assert.IsNull(result); //mykey should be in db 1
                 selectResult = client.Select("1".ToByte());
                 Assert.IsNotNull(selectResult);
                 Assert.AreEqual("OK", selectResult);
-                result = client.Get("mykey");
+                result = client.Strings.Get("mykey");
                 Assert.IsNotNull(result);
                 Assert.AreEqual("value", result);
             }

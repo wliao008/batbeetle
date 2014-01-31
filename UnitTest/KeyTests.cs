@@ -13,9 +13,9 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("key1", "val1");
-                client.Set("key2", "val2");
-                client.Set("key3", "val3");
+                client.Strings.Set("key1", "val1");
+                client.Strings.Set("key2", "val2");
+                client.Strings.Set("key3", "val3");
                 var result = client.Del("key1".ToByte(), "key2".ToByte(), "key3".ToByte());
                 Assert.AreEqual(3, result);
             }
@@ -36,7 +36,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "10");
+                client.Strings.Set("mykey", "10");
                 var result = client.Dump("mykey".ToByte());
                 Assert.IsNotNull(result.BytesToString());
             }
@@ -57,7 +57,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "10");
+                client.Strings.Set("mykey", "10");
                 var result = client.Exists("mykey".ToByte());
                 Assert.AreEqual(1, result);
             }
@@ -78,7 +78,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "10");
+                client.Strings.Set("mykey", "10");
                 var result = client.Ttl("mykey".ToByte());
                 Assert.AreEqual(-1, result);
                 result = client.Expire("mykey".ToByte(), "10".ToByte());
@@ -103,7 +103,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "10");
+                client.Strings.Set("mykey", "10");
                 var result = client.Exists("mykey".ToByte());
                 Assert.AreEqual(1, result);
                 client.ExpireAt("mykey".ToByte(), "1293840000".ToByte());
@@ -127,10 +127,10 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("one", "1");
-                client.Set("two", "2");
-                client.Set("three", "3");
-                client.Set("four", "4");
+                client.Strings.Set("one", "1");
+                client.Strings.Set("two", "2");
+                client.Strings.Set("three", "3");
+                client.Strings.Set("four", "4");
                 var result = client.Keys("*o*".ToByte());
                 Assert.IsNotNull(result);
                 var split = result.MultiBytesToString().Split(new char[] { '\r', '\n' });
@@ -147,10 +147,10 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("one", "1");
-                client.Set("two", "2");
-                client.Set("three", "3");
-                client.Set("four", "4");
+                client.Strings.Set("one", "1");
+                client.Strings.Set("two", "2");
+                client.Strings.Set("three", "3");
+                client.Strings.Set("four", "4");
                 var result = client.Keys("t??".ToByte());
                 Assert.IsNotNull(result);
                 Assert.AreEqual("two\r\n", result.MultiBytesToString());
@@ -162,10 +162,10 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("one", "1");
-                client.Set("two", "2");
-                client.Set("three", "3");
-                client.Set("four", "4");
+                client.Strings.Set("one", "1");
+                client.Strings.Set("two", "2");
+                client.Strings.Set("three", "3");
+                client.Strings.Set("four", "4");
                 var result = client.Keys("*".ToByte());
                 Assert.IsNotNull(result);
                 var split = result.MultiBytesToString().Split(new char[] { '\r', '\n' });
@@ -183,10 +183,10 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("one", "1");
-                client.Set("two", "2");
-                client.Set("three", "3");
-                client.Set("four", "4");
+                client.Strings.Set("one", "1");
+                client.Strings.Set("two", "2");
+                client.Strings.Set("three", "3");
+                client.Strings.Set("four", "4");
                 var result = client.Keys("nonmatching".ToByte());
                 Assert.IsNotNull(result);
                 Assert.AreEqual("", result.MultiBytesToString());
@@ -198,11 +198,11 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "val");
+                client.Strings.Set("mykey", "val");
                 var result = client.Move("mykey".ToByte(), "1".ToByte());
                 Assert.AreEqual(1, result);
                 client.Select("1".ToByte());
-                var result2 = client.Get("mykey");
+                var result2 = client.Strings.Get("mykey");
                 Assert.AreEqual("val", result2);
             }
         }
@@ -222,7 +222,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "val");
+                client.Strings.Set("mykey", "val");
                 var result = client.Object(Commands.Refcount, "mykey".ToByte());
                 Assert.AreEqual(1, result);
             }
@@ -243,7 +243,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "val");
+                client.Strings.Set("mykey", "val");
                 var result = client.Object(Commands.Idletime, "mykey".ToByte());
                 Assert.IsNotNull(result);
             }
@@ -254,7 +254,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "val");
+                client.Strings.Set("mykey", "val");
                 var result = client.ObjectEncoding("mykey".ToByte());
                 Assert.IsNotNull(result);
                 Assert.AreEqual("raw", result.BytesToString());
@@ -266,7 +266,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "10");
+                client.Strings.Set("mykey", "10");
                 var result = client.ObjectEncoding("mykey".ToByte());
                 Assert.IsNotNull(result);
                 Assert.AreEqual("int", result.BytesToString());
@@ -278,11 +278,11 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "1000");
+                client.Strings.Set("mykey", "1000");
                 var result = client.ObjectEncoding("mykey".ToByte());
                 Assert.IsNotNull(result);
                 Assert.AreEqual("int", result.BytesToString());
-                client.Append("mykey".ToByte(), "bar".ToByte());
+                client.Strings.Append("mykey", "bar");
                 result = client.ObjectEncoding("mykey".ToByte());
                 Assert.IsNotNull(result);
                 Assert.AreEqual("raw", result.BytesToString());
@@ -294,7 +294,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "1000", 10);
+                client.Strings.Set("mykey", "1000", 10);
                 var result = client.Ttl("mykey".ToByte());
                 Assert.AreNotEqual(-1, result);
                 client.Persist("mykey".ToByte()); 
@@ -318,7 +318,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "10");
+                client.Strings.Set("mykey", "10");
                 var result = client.Ttl("mykey".ToByte());
                 Assert.AreEqual(-1, result);
                 result = client.PExpire("mykey".ToByte(), "10000".ToByte());
@@ -343,7 +343,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "10");
+                client.Strings.Set("mykey", "10");
                 var result = client.Exists("mykey".ToByte());
                 Assert.AreEqual(1, result);
                 client.PExpireAt("mykey".ToByte(), "1293840000".ToByte());
@@ -367,7 +367,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "val");
+                client.Strings.Set("mykey", "val");
                 client.Expire("mykey".ToByte(), "1".ToByte());
                 var result = client.PTtl("mykey".ToByte());
                 Assert.AreNotEqual(-2, result);
@@ -381,7 +381,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "val");
+                client.Strings.Set("mykey", "val");
                 var result = client.PTtl("mykey".ToByte());
                 Assert.AreEqual(-1, result);
             }
@@ -405,7 +405,7 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 for (int i = 0; i < 10; ++i)
-                    client.Set("key" + i, i.ToString());
+                    client.Strings.Set("key" + i, i.ToString());
                 var result = client.RandomKey();
                 Assert.IsNotNull(result);
             }
@@ -426,11 +426,11 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "val");
+                client.Strings.Set("mykey", "val");
                 client.Rename("mykey".ToByte(), "mynewkey".ToByte());
-                var result = client.Get("mykey");
+                var result = client.Strings.Get("mykey");
                 Assert.IsNull(result);
-                result = client.Get("mynewkey");
+                result = client.Strings.Get("mynewkey");
                 Assert.IsNotNull(result);
                 Assert.AreEqual("val", result);
             }
@@ -441,7 +441,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "val");
+                client.Strings.Set("mykey", "val");
                 var result = client.Rename("mykey".ToByte(), "mykey".ToByte());
                 Assert.IsNull(result);
             }
@@ -452,10 +452,10 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "val");
-                client.Set("mynewkey", "new value");
+                client.Strings.Set("mykey", "val");
+                client.Strings.Set("mynewkey", "new value");
                 client.Rename("mykey".ToByte(), "mynewkey".ToByte());
-                var result = client.Get("mynewkey");
+                var result = client.Strings.Get("mynewkey");
                 Assert.IsNotNull(result);
                 Assert.AreEqual("val", result);
             }
@@ -466,10 +466,10 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "val");
-                client.Set("mynewkey", "new value");
+                client.Strings.Set("mykey", "val");
+                client.Strings.Set("mynewkey", "new value");
                 client.RenameNx("mykey".ToByte(), "mynewkey".ToByte());
-                var result = client.Get("mynewkey");
+                var result = client.Strings.Get("mynewkey");
                 Assert.IsNotNull(result);
                 Assert.AreEqual("new value", result);
             }
@@ -480,9 +480,9 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "val");
+                client.Strings.Set("mykey", "val");
                 client.RenameNx("mykey".ToByte(), "mynewkey".ToByte());
-                var result = client.Get("mynewkey");
+                var result = client.Strings.Get("mynewkey");
                 Assert.IsNotNull(result);
                 Assert.AreEqual("val", result);
             }
@@ -493,7 +493,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "val");
+                client.Strings.Set("mykey", "val");
                 var result = client.RenameNx("mykey".ToByte(), "mykey".ToByte());
                 Assert.AreEqual(0, result);
             }
@@ -504,7 +504,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "hi");
+                client.Strings.Set("mykey", "hi");
                 var serializedVal = client.Dump("mykey".ToByte());
                 client.Del("mykey".ToByte());
                 var result = client.Restore("mykey".ToByte(), "0".ToByte(), serializedVal);
@@ -518,7 +518,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "val");
+                client.Strings.Set("mykey", "val");
                 var result = client.Type("mykey".ToByte());
                 Assert.AreEqual("string", result);
             }

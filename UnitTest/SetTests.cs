@@ -297,8 +297,8 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("source", "source");
-                client.Set("destination", "destination");
+                client.Strings.Set("source", "source");
+                client.Strings.Set("destination", "destination");
                 var result = client.SMove("source".ToByte(), "destination".ToByte(), "World".ToByte());
                 Assert.IsNull(result);
             }
@@ -417,7 +417,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("myset", "val");
+                client.Strings.Set("myset", "val");
                 var result = client.SRem("myset".ToByte(), "five".ToByte(), "seven".ToByte());
                 Assert.IsNull(result);
             }

@@ -239,7 +239,7 @@ namespace Batbeetle
         #endregion
 
         #region Strings
-        public int Append(byte[] key, byte[] value)
+        protected internal int Append(byte[] key, byte[] value)
         {
             var cmd = new RedisCommand(Commands.Append);
             cmd.ArgList.Add(key);
@@ -277,7 +277,7 @@ namespace Batbeetle
             return this.ReadIntResponse();
         }
 
-        public byte[] Get(byte[] key)
+        protected internal byte[] Get(byte[] key)
         {
             var cmd = new RedisCommand(Commands.Get);
             cmd.ArgList.Add(key);
@@ -378,12 +378,12 @@ namespace Batbeetle
             return this.ReadIntResponse().Value;
         }
 
-        protected string Set(byte[] key, byte[] value)
+        protected internal string Set(byte[] key, byte[] value)
         {
             return this.Set(key, value, null, null, false, false);
         }
 
-        protected string Set(byte[] key, byte[] value, byte[] ex, byte[] px, bool nx, bool xx)
+        protected internal string Set(byte[] key, byte[] value, byte[] ex, byte[] px, bool nx, bool xx)
         {
             var cmd = new RedisCommand(Commands.Set);
             cmd.ArgList.Add(key);

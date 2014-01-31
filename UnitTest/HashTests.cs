@@ -483,7 +483,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("key1", "val");
+                client.Strings.Set("key1", "val");
                 var keys = new byte[2][];
                 var vals = new byte[2][];
                 keys[0] = "key1".ToByte(); vals[0] = "val1".ToByte(); //key1 already exist
@@ -492,7 +492,7 @@ namespace UnitTest
                 var result = client.MSetNx(keys, vals);
                 Assert.AreEqual(0, result);
                 //Operation is atomic, so key2 should not be set if key1 is not
-                var result2 = client.Get("key2");
+                var result2 = client.Strings.Get("key2");
                 Assert.IsNull(result2);
             }
         }

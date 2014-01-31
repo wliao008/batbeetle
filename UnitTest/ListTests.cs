@@ -174,7 +174,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mykey", "hi");
+                client.Strings.Set("mykey", "hi");
                 var result = client.LPush("mykey".ToByte(), "world".ToByte());
                 Assert.IsNull(result);
             }
@@ -479,7 +479,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Set("mylist", "val");
+                client.Strings.Set("mylist", "val");
                 var result = client.RPush("mylist".ToByte(), "one".ToByte(), "two".ToByte(), "three".ToByte());
                 Assert.IsNull(result);
             }
