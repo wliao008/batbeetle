@@ -10,7 +10,7 @@ namespace Batbeetle
     public class Subscription
     {
         public delegate void EventHandler(object sender, SubscriptionEventArgs e);
-        public event EventHandler OnSubscribed, OnUnsubscribed;
+        //public event EventHandler OnSubscribed, OnUnsubscribed;
         public event EventHandler OnMessageReceived;
         private RedisClient client;
         private static int subscriberCount;
@@ -33,12 +33,12 @@ namespace Batbeetle
                 cmd.ArgList.Add(channel.ToByte());
             this.client.SendCommand(cmd);
 
-            foreach (var ch in channels)
-            {
-                var subdata = this.client.ReadMultibulkResponse();
-                if (OnSubscribed != null)
-                    OnSubscribed(this, new SubscriptionEventArgs(subdata));
-            }
+            //foreach (var ch in channels)
+            //{
+            //    var subdata = this.client.ReadMultibulkResponse();
+            //    if (OnSubscribed != null)
+            //        OnSubscribed(this, new SubscriptionEventArgs(subdata));
+            //}
 
             while (subscriberCount > 0 && this.client.IsConnected())
             {
@@ -63,11 +63,13 @@ namespace Batbeetle
             foreach (var channel in channels)
                 cmd.ArgList.Add(channel.ToByte());
             this.client.SendCommand(cmd);
-            foreach (var ch in channels)
+            
+            //if no channels given, all are unsubscribed
+            for (int i = 0; i <= subscriberCount; i++)
             {
                 var unsubdata = this.client.ReadMultibulkResponse();
-                if (OnUnsubscribed != null)
-                    OnUnsubscribed(this, new SubscriptionEventArgs(unsubdata));
+                if (OnMessageReceived != null)
+                    OnMessageReceived(this, new SubscriptionEventArgs(unsubdata));
             }
         }
     }
