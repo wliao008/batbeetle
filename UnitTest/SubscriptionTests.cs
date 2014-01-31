@@ -6,7 +6,7 @@ using System.Threading;
 namespace UnitTest
 {
     [TestClass]
-    public class PubsubTests : TestBase
+    public class SubscriptionTests : TestBase
     {
         //[TestMethod]
         //public void Publish_ValidParms_ShouldPublishMsg()

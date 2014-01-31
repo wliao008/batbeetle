@@ -49,6 +49,10 @@ namespace Batbeetle
             }
         }
 
+        /// <summary>
+        /// Unsubscribes the client from the given channels, or from all of them if none is given.
+        /// </summary>
+        /// <param name="channels"></param>
         public void Unsubscribe(params string[] channels)
         {
             lock (locker)

@@ -53,7 +53,7 @@
     <Compile Include="ConnectionTests.cs" />
     <Compile Include="KeyTests.cs" />
     <Compile Include="ListTests.cs" />
-    <Compile Include="PubsubTests.cs" />
+    <Compile Include="SubscriptionTests.cs" />
     <Compile Include="SetTests.cs" />
     <Compile Include="SortedSetTests.cs" />
     <Compile Include="TestBase.cs" />
