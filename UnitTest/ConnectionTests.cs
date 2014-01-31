@@ -54,7 +54,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                var result = client.Ping();
+                var result = client.Connection.Ping();
                 Assert.IsTrue(result);
             }
         }
@@ -64,7 +64,7 @@ namespace UnitTest
         {
             var client = new RedisClient(this.Host);
             client.Quit();
-            var result = client.Ping();
+            var result = client.Connection.Ping();
             Assert.IsFalse(result);
         }
     }

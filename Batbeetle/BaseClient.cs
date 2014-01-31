@@ -248,7 +248,7 @@ namespace Batbeetle
             return this.ReadIntResponse().Value;
         }
 
-        public int BitCount(byte[] key, byte[] start, byte[] end)
+        protected internal int BitCount(byte[] key, byte[] start, byte[] end)
         {
             var cmd = new RedisCommand(Commands.Bitcount);
             cmd.ArgList.Add(key);
@@ -260,7 +260,7 @@ namespace Batbeetle
             return this.ReadIntResponse().Value;
         }
 
-        public int? Decr(byte[] key)
+        protected internal int? Decr(byte[] key)
         {
             var cmd = new RedisCommand(Commands.Decr);
             cmd.ArgList.Add(key);
@@ -268,7 +268,7 @@ namespace Batbeetle
             return this.ReadIntResponse();
         }
 
-        public int? DecrBy(byte[] key, byte[] decrement)
+        protected internal int? DecrBy(byte[] key, byte[] decrement)
         {
             var cmd = new RedisCommand(Commands.Decrby);
             cmd.ArgList.Add(key);
@@ -285,7 +285,7 @@ namespace Batbeetle
             return this.ReadBulkResponse();
         }
 
-        public int GetBit(byte[] key, byte[] offset)
+        protected internal int GetBit(byte[] key, byte[] offset)
         {
             var cmd = new RedisCommand(Commands.Getbit);
             cmd.ArgList.Add(key);
@@ -294,7 +294,7 @@ namespace Batbeetle
             return this.ReadIntResponse().Value;
         }
 
-        public byte[] GetRange(byte[] key, byte[] start, byte[] end)
+        protected internal byte[] GetRange(byte[] key, byte[] start, byte[] end)
         {
             var cmd = new RedisCommand(Commands.Getrange);
             cmd.ArgList.Add(key);
@@ -468,7 +468,7 @@ namespace Batbeetle
             return this.ReadBulkResponse();
         }
 
-        public byte[][] HMGetAll(byte[] key)
+        protected internal byte[][] HMGetAll(byte[] key)
         {
             var cmd = new RedisCommand(Commands.Hgetall);
             cmd.ArgList.Add(key);
@@ -525,7 +525,7 @@ namespace Batbeetle
             return resp;
         }
 
-        public string HMSet(byte[] key, byte[][] fieldKeys, byte[][] fieldValues)
+        protected internal string HMSet(byte[] key, byte[][] fieldKeys, byte[][] fieldValues)
         {
             var cmd = new RedisCommand(Commands.Hmset);
             cmd.ArgList.Add(key);
@@ -1163,7 +1163,7 @@ namespace Batbeetle
             return this.ReadBulkResponse();
         }
 
-        protected string Ping()
+        protected internal string Ping()
         {
             var cmd = new RedisCommand(Commands.Ping);
             this.SendCommand(cmd);

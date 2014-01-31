@@ -532,7 +532,7 @@ namespace UnitTest
                 Hashtable tbl = new Hashtable();
                 tbl["key1"] = "val1";
                 tbl["age"] = 2;
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
                 var result = client.Type("mykey".ToByte());
                 Assert.AreEqual("hash", result);
             }

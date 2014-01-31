@@ -37,10 +37,10 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 client.Strings.Set("mykey", "foobar");
-                var result = client.BitCount("mykey".ToByte(), null, null);
+                var result = client.Strings.BitCount("mykey", null, null);
                 Assert.AreEqual(26, result);
                 client.Strings.Set("mykey", "1"); //-> note, 1 is treated as a char value of 49.
-                result = client.BitCount("mykey".ToByte(), null, null);
+                result = client.Strings.BitCount("mykey", null, null);
                 Assert.AreEqual(3, result);
             }
         }
@@ -51,9 +51,9 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 client.Strings.Set("mykey", "foobar");
-                var result = client.BitCount("mykey".ToByte(), "0".ToByte(), "0".ToByte());
+                var result = client.Strings.BitCount("mykey", 0, 0);
                 Assert.AreEqual(4, result);
-                result = client.BitCount("mykey".ToByte(), "1".ToByte(), "1".ToByte());
+                result = client.Strings.BitCount("mykey", 1, 1);
                 Assert.AreEqual(6, result);
             }
         }
@@ -63,7 +63,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                var result = client.BitCount("nonExistingKey".ToByte(), null, null);
+                var result = client.Strings.BitCount("nonExistingKey", null, null);
                 Assert.AreEqual(0, result);
             }
         }
@@ -74,7 +74,7 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 client.Strings.Set("mykey", "10");
-                var result = client.Decr("mykey".ToByte());
+                var result = client.Strings.Decr("mykey");
                 Assert.AreEqual(9, result);
             }
         }
@@ -85,7 +85,7 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 //set nonExistingKey to 0, then perform the operation
-                var result = client.Decr("nonExistingKey".ToByte());
+                var result = client.Strings.Decr("nonExistingKey");
                 Assert.AreEqual(-1, result);
             }
         }
@@ -97,7 +97,7 @@ namespace UnitTest
             {
                 //limits to 64bit signed int.
                 client.Strings.Set("mykey", "234293482390480948029348230948");
-                var result = client.Decr("mykey".ToByte());
+                var result = client.Strings.Decr("mykey");
                 Assert.IsNull(result);
             }
         }
@@ -108,7 +108,7 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 client.Strings.Set("mykey", "10");
-                var result = client.DecrBy("mykey".ToByte(), "5".ToByte());
+                var result = client.Strings.DecrBy("mykey", 5);
                 Assert.AreEqual(5, result);
             }
         }
@@ -119,7 +119,7 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 //set nonExistingKey to 0, then perform the operation
-                var result = client.DecrBy("nonExistingKey".ToByte(), "5".ToByte());
+                var result = client.Strings.DecrBy("nonExistingKey", 5);
                 Assert.AreEqual(-5, result);
             }
         }
@@ -131,7 +131,7 @@ namespace UnitTest
             {
                 //limits to 64bit signed int.
                 client.Strings.Set("mykey", "234293482390480948029348230948");
-                var result = client.DecrBy("mykey".ToByte(), "5".ToByte());
+                var result = client.Strings.DecrBy("mykey", 5);
                 Assert.IsNull(result);
             }
         }
@@ -165,7 +165,7 @@ namespace UnitTest
                 Hashtable tbl = new Hashtable();
                 tbl["name"] = "test";
                 tbl["age"] = 1;
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
                 var result = client.Strings.Get("mykey");
                 Assert.IsNull(result);
             }
@@ -177,11 +177,11 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 client.SetBit("mykey".ToByte(), "7".ToByte(), "1".ToByte());
-                var result = client.GetBit("mykey".ToByte(), "0".ToByte());
+                var result = client.Strings.GetBit("mykey", 0);
                 Assert.AreEqual(0, result);
-                result = client.GetBit("mykey".ToByte(), "7".ToByte());
+                result = client.Strings.GetBit("mykey", 7);
                 Assert.AreEqual(1, result);
-                result = client.GetBit("mykey".ToByte(), "100".ToByte());
+                result = client.Strings.GetBit("mykey", 100);
                 Assert.AreEqual(0, result);
             }
         }
@@ -192,7 +192,7 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 client.SetBit("mykey".ToByte(), "7".ToByte(), "1".ToByte());
-                var result = client.GetBit("mykey".ToByte(), "100".ToByte());
+                var result = client.Strings.GetBit("mykey", 100);
                 Assert.AreEqual(0, result);
             }
         }
@@ -202,7 +202,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                var result = client.GetBit("nonExistingKey".ToByte(), "1".ToByte());
+                var result = client.Strings.GetBit("nonExistingKey", 1);
                 Assert.AreEqual(0, result);
             }
         }
@@ -213,14 +213,14 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 client.Strings.Set("mykey", "This is a string");
-                var result = client.GetRange("mykey".ToByte(), "0".ToByte(), "3".ToByte());
-                Assert.AreEqual("This", result.BytesToString());
-                result = client.GetRange("mykey".ToByte(), "-3".ToByte(), "-1".ToByte());
-                Assert.AreEqual("ing", result.BytesToString());
-                result = client.GetRange("mykey".ToByte(), "0".ToByte(), "-1".ToByte());
-                Assert.AreEqual("This is a string", result.BytesToString());
-                result = client.GetRange("mykey".ToByte(), "10".ToByte(), "100".ToByte());
-                Assert.AreEqual("string", result.BytesToString());
+                var result = client.Strings.GetRange("mykey", 0, 3);
+                Assert.AreEqual("This", result);
+                result = client.Strings.GetRange("mykey", -3, -1);
+                Assert.AreEqual("ing", result);
+                result = client.Strings.GetRange("mykey", 0, -1);
+                Assert.AreEqual("This is a string", result);
+                result = client.Strings.GetRange("mykey", 10, 100);
+                Assert.AreEqual("string", result);
             }
         }
 
@@ -229,8 +229,8 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                var result = client.GetRange("nonExistingKey".ToByte(), "0".ToByte(), "-1".ToByte());
-                Assert.AreEqual("", result.BytesToString());
+                var result = client.Strings.GetRange("nonExistingKey", 0, -1);
+                Assert.AreEqual("", result);
             }
         }
 
@@ -242,8 +242,8 @@ namespace UnitTest
                 Hashtable tbl = new Hashtable();
                 tbl["name"] = "test";
                 tbl["age"] = 1;
-                client.HMSet("mykey", tbl);
-                var result = client.GetRange("mykey".ToByte(), "0".ToByte(), "-1".ToByte());
+                client.Hashes.HMSet("mykey", tbl);
+                var result = client.Strings.GetRange("mykey", 0, -1);
                 Assert.IsNull(result);
             }
         }
@@ -279,7 +279,7 @@ namespace UnitTest
                 Hashtable tbl = new Hashtable();
                 tbl["name"] = "test";
                 tbl["age"] = 1;
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
                 var result = client.GetSet("mykey".ToByte(), "0".ToByte());
                 Assert.IsNull(result);
             }
@@ -394,7 +394,7 @@ namespace UnitTest
                 Hashtable tbl = new Hashtable();
                 tbl["name"] = "test";
                 tbl["age"] = 1;
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
                 var result = client.IncrByFloat("mykey".ToByte(), "0.1".ToByte());
                 Assert.IsNull(result);
             }
@@ -436,7 +436,7 @@ namespace UnitTest
                 Hashtable tbl = new Hashtable();
                 tbl["name"] = "test";
                 tbl["age"] = 1;
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
                 var result = client.MGet("mykey".ToByte()); //this op should never fail
                 Assert.IsNotNull(result);
                 Assert.AreEqual("", result.MultiBytesToString());

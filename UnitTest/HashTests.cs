@@ -18,9 +18,9 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
                 client.HDel("mykey".ToByte(), "age".ToByte());
-                var result = client.HMGetAll("mykey");
+                var result = client.Hashes.HMGetAll("mykey");
                 Assert.IsNotNull(result);
                 Assert.AreEqual("test", result["name"]);
                 Assert.AreEqual("test@ttest.com", result["email"]);
@@ -40,10 +40,10 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
                 var delResult = client.HDel("mykey".ToByte(), "nonExistingField".ToByte());
                 Assert.AreEqual(0, delResult);
-                var result = client.HMGetAll("mykey");
+                var result = client.Hashes.HMGetAll("mykey");
             }
         }
 
@@ -56,7 +56,7 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
                 var result = client.HExists("mykey".ToByte(), "age".ToByte());
                 Assert.AreEqual(1, result);
                 result = client.HExists("mykey".ToByte(), "nonExistingField".ToByte());
@@ -85,7 +85,7 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
 
                 var result = client.HGet("mykey".ToByte(), "age".ToByte());
                 Assert.AreEqual("20", result.BytesToString());
@@ -101,7 +101,7 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
 
                 var result = client.HGet("mykey".ToByte(), "nonExistingField".ToByte());
                 Assert.IsNull(result);
@@ -127,9 +127,9 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
 
-                var result = client.HMGetAll("mykey");
+                var result = client.Hashes.HMGetAll("mykey");
                 Assert.AreEqual("test", result["name"]);
                 Assert.AreEqual("20", result["age"]);
                 Assert.AreEqual("test@ttest.com", result["email"]);
@@ -141,7 +141,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                var result = client.HMGetAll("nonExistingKey");
+                var result = client.Hashes.HMGetAll("nonExistingKey");
                 Assert.IsNotNull(result);
                 Assert.AreEqual(0, result.Count);
             }
@@ -156,7 +156,7 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
 
                 var result = client.HIncrBy("mykey".ToByte(), "age".ToByte(), "1".ToByte());
                 Assert.AreEqual(21, result);
@@ -172,7 +172,7 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
 
                 var result = client.HIncrBy("mykey".ToByte(), "num".ToByte(), "10".ToByte());
                 Assert.AreEqual(10, result);
@@ -213,7 +213,7 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
 
                 var result = client.HIncrByFloat("mykey".ToByte(), "age".ToByte(), "10.50".ToByte());
                 Assert.AreEqual("30.5", result.BytesToString());
@@ -229,7 +229,7 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = "5.0e3";
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
 
                 var result = client.HIncrByFloat("mykey".ToByte(), "age".ToByte(), "2.0e2".ToByte());
                 Assert.AreEqual("5200", result.BytesToString());
@@ -256,7 +256,7 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
 
                 var result = client.HKeys("mykey".ToByte());
                 Assert.IsNotNull(result);
@@ -289,7 +289,7 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
 
                 var result = client.HLen("mykey".ToByte());
                 Assert.AreEqual(3, result);
@@ -315,7 +315,7 @@ namespace UnitTest
                 tbl["name"] = "val";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
 
                 var result = client.HMGet("mykey".ToByte(), "age".ToByte(), "email".ToByte());
                 Assert.IsNotNull(result);
@@ -353,14 +353,14 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
 
                 var tbl2 = new Hashtable();
                 tbl2["name"] = "test2";
                 tbl2["newfield"] = "sup";
-                client.HMSet("mykey", tbl2);
+                client.Hashes.HMSet("mykey", tbl2);
 
-                var result = client.HMGetAll("mykey");
+                var result = client.Hashes.HMGetAll("mykey");
                 Assert.IsNotNull(result);
                 Assert.AreEqual("test2", result["name"]);
                 Assert.AreEqual("20", result["age"]);
@@ -378,9 +378,9 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
 
-                var result = client.HMGetAll("mykey");
+                var result = client.Hashes.HMGetAll("mykey");
                 Assert.IsNotNull(result);
                 Assert.AreEqual("test", result["name"]);
                 Assert.AreEqual("20", result["age"]);
@@ -397,7 +397,7 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
 
                 var result = client.HSet("mykey".ToByte(), "num".ToByte(), "10".ToByte());
                 Assert.AreEqual(1, result);
@@ -415,7 +415,7 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
 
                 var result = client.HSet("mykey".ToByte(), "age".ToByte(), "10".ToByte());
                 Assert.AreEqual(0, result);
@@ -455,7 +455,7 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
 
                 var result = client.HSetNx("mykey".ToByte(), "num".ToByte(), "10".ToByte());
                 Assert.AreEqual(1, result);
@@ -471,7 +471,7 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
 
                 var result = client.HSetNx("mykey".ToByte(), "age".ToByte(), "10".ToByte());
                 Assert.AreEqual(0, result);
@@ -506,7 +506,7 @@ namespace UnitTest
                 tbl["name"] = "val";
                 tbl["age"] = 20;
                 tbl["email"] = "test@ttest.com";
-                client.HMSet("mykey", tbl);
+                client.Hashes.HMSet("mykey", tbl);
 
                 var result = client.KVals("mykey".ToByte());
                 Assert.IsNotNull(result);

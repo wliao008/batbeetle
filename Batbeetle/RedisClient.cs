@@ -7,46 +7,15 @@ namespace Batbeetle
     public class RedisClient : BaseClient
     {
         public Strings Strings { get; set; }
+        public Hashes Hashes { get; set; }
+        public Connection Connection { get; set; }
+
         public RedisClient(string host, int port = 6379)
             : base(host, port)
         {
             this.Strings = new Strings(this);
-        }
-
-        #region Connection
-        public new bool Ping()
-        {
-            var result = base.Ping();
-            if (result == null) return false;
-            return result.Equals("PONG");
-        }
-        #endregion
-
-        public void HMSet(string key, Hashtable hash)
-        {
-            var len = hash.Count;
-            var keys = new byte[len][];
-            var vals = new byte[len][];
-            int i = 0;
-            foreach(DictionaryEntry de in hash)
-            {
-                keys[i] = de.Key.ToByte();
-                vals[i] = de.Value.ToByte();
-                i++;
-            }
-
-            base.HMSet(key.ToByte(), keys, vals);
-        }
-
-        public Hashtable HMGetAll(string key)
-        {
-            var data = base.HMGetAll(key.ToByte());
-            var str = data.MultiBytesToString();
-            var sc = str.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            Hashtable tbl = new Hashtable();
-            for (int i = 0; i < sc.Length; i += 2)
-                tbl[sc[i]] = sc[i + 1];
-            return tbl;
+            this.Connection = new Connection(this);
+            this.Hashes = new Hashes(this);
         }
     }
 
@@ -66,6 +35,54 @@ namespace Batbeetle
         {
             var result = this.client.Append(Encoding.UTF8.GetBytes(key), Encoding.UTF8.GetBytes(value));
             return result;
+        }
+
+        public int BitCount(string key, int? start, int? end)
+        {
+            var result = this.client.BitCount(
+                Encoding.UTF8.GetBytes(key),
+                start.HasValue ? Encoding.UTF8.GetBytes(start.ToString()) : null, 
+                end.HasValue ? Encoding.UTF8.GetBytes(end.ToString()) : null);
+            return result;
+        }
+
+        public int? Decr(string key)
+        {
+            var result = this.client.Decr(Encoding.UTF8.GetBytes(key));
+            return result;
+        }
+
+        public int? DecrBy(string key, int decrement)
+        {
+            var result = this.client.DecrBy(
+                Encoding.UTF8.GetBytes(key),
+                Encoding.UTF8.GetBytes(decrement.ToString()));
+            return result;
+        }
+
+        public string Get(string key)
+        {
+            var bytes = this.client.Get(Encoding.UTF8.GetBytes(key));
+            if (bytes == null) return null;
+            return Encoding.UTF8.GetString(bytes);
+        }
+
+        public int GetBit(string key, int offset)
+        {
+            var result = this.client.GetBit(
+                Encoding.UTF8.GetBytes(key),
+                Encoding.UTF8.GetBytes(offset.ToString()));
+            return result;
+        }
+
+        public string GetRange(string key, int start, int end)
+        {
+            var bytes = this.client.GetRange(
+                Encoding.UTF8.GetBytes(key),
+                Encoding.UTF8.GetBytes(start.ToString()),
+                Encoding.UTF8.GetBytes(end.ToString()));
+            if (bytes == null) return null;
+            return Encoding.UTF8.GetString(bytes);
         }
 
         public bool Set(string key, string value)
@@ -106,17 +123,42 @@ namespace Batbeetle
             if (result == null) return false;
             return result.Equals("OK");
         }
-
-        public string Get(string key)
-        {
-            var bytes = this.client.Get(Encoding.UTF8.GetBytes(key));
-            if (bytes == null) return null;
-            return Encoding.UTF8.GetString(bytes);
-        }
     }
 
     public class Hashes
     {
+        private RedisClient client;
+        public Hashes(RedisClient client)
+        {
+            this.client = client;
+        }
+
+        public void HMSet(string key, Hashtable hash)
+        {
+            var len = hash.Count;
+            var keys = new byte[len][];
+            var vals = new byte[len][];
+            int i = 0;
+            foreach (DictionaryEntry de in hash)
+            {
+                keys[i] = de.Key.ToByte();
+                vals[i] = de.Value.ToByte();
+                i++;
+            }
+
+            this.client.HMSet(key.ToByte(), keys, vals);
+        }
+
+        public Hashtable HMGetAll(string key)
+        {
+            var data = this.client.HMGetAll(key.ToByte());
+            var str = data.MultiBytesToString();
+            var sc = str.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            Hashtable tbl = new Hashtable();
+            for (int i = 0; i < sc.Length; i += 2)
+                tbl[sc[i]] = sc[i + 1];
+            return tbl;
+        }
     }
 
     public class Lists
@@ -133,5 +175,17 @@ namespace Batbeetle
 
     public class Connection
     {
+        private RedisClient client;
+        public Connection(RedisClient client)
+        {
+            this.client = client;
+        }
+
+        public bool Ping()
+        {
+            var result = this.client.Ping();
+            if (result == null) return false;
+            return result.Equals("PONG");
+        }
     }
 }
