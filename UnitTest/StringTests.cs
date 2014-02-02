@@ -253,10 +253,10 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                client.Incr("mycounter".ToByte()); //1
-                var result = client.GetSet("mycounter".ToByte(), "0".ToByte());
+                client.Strings.Incr("mycounter"); //1
+                var result = client.Strings.GetSet("mycounter", "0");
                 var result2 = client.Strings.Get("mycounter");
-                Assert.AreEqual("1", result.BytesToString());
+                Assert.AreEqual("1", result);
                 Assert.AreEqual("0", result2);
             }
         }
@@ -266,7 +266,7 @@ namespace UnitTest
         {
             using (var client = new RedisClient(this.Host))
             {
-                var result = client.GetSet("nonExistingKey".ToByte(), "0".ToByte());
+                var result = client.Strings.GetSet("nonExistingKey", "0");
                 Assert.IsNull(result);
             }
         }
@@ -280,7 +280,7 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 1;
                 client.Hashes.HMSet("mykey", tbl);
-                var result = client.GetSet("mykey".ToByte(), "0".ToByte());
+                var result = client.Strings.GetSet("mykey", "0");
                 Assert.IsNull(result);
             }
         }
@@ -291,7 +291,7 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 client.Strings.Set("mykey", "10");
-                var result = client.Incr("mykey".ToByte());
+                var result = client.Strings.Incr("mykey");
                 Assert.AreEqual(11, result);
             }
         }
@@ -302,7 +302,7 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 //set nonExistingKey to 0, then perform the operation
-                var result = client.Incr("nonExistingKey".ToByte());
+                var result = client.Strings.Incr("nonExistingKey");
                 Assert.AreEqual(1, result);
             }
         }
@@ -314,7 +314,7 @@ namespace UnitTest
             {
                 //limits to 64bit signed int.
                 client.Strings.Set("mykey", "234293482390480948029348230948");
-                var result = client.Incr("mykey".ToByte());
+                var result = client.Strings.Incr("mykey");
                 Assert.IsNull(result);
             }
         }
@@ -325,7 +325,7 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 client.Strings.Set("mykey", "10");
-                var result = client.IncrBy("mykey".ToByte(), "5".ToByte());
+                var result = client.Strings.IncrBy("mykey", 5);
                 Assert.AreEqual(15, result);
             }
         }
@@ -336,7 +336,7 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 //set nonExistingKey to 0, then perform the operation
-                var result = client.IncrBy("nonExistingKey".ToByte(), "5".ToByte());
+                var result = client.Strings.IncrBy("nonExistingKey", 5);
                 Assert.AreEqual(5, result);
             }
         }
@@ -348,7 +348,7 @@ namespace UnitTest
             {
                 //limits to 64bit signed int.
                 client.Strings.Set("mykey", "234293482390480948029348230948");
-                var result = client.IncrBy("mykey".ToByte(), "5".ToByte());
+                var result = client.Strings.IncrBy("mykey", 5);
                 Assert.IsNull(result);
             }
         }
@@ -359,8 +359,8 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 client.Strings.Set("mykey", "10.50");
-                var result = client.IncrByFloat("mykey".ToByte(), "0.1".ToByte());
-                Assert.AreEqual("10.6", result.BytesToString());
+                var result = client.Strings.IncrByFloat("mykey", 0.1);
+                Assert.AreEqual(10.6, result);
             }
         }
 
@@ -370,8 +370,8 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 client.Strings.Set("mykey", "5.0e3");
-                var result = client.IncrByFloat("mykey".ToByte(), "2.0e2".ToByte());
-                Assert.AreEqual("5200", result.BytesToString());
+                var result = client.Strings.IncrByFloat("mykey", 2.0e2);
+                Assert.AreEqual(5200, result);
             }
         }
 
@@ -381,8 +381,8 @@ namespace UnitTest
             using (var client = new RedisClient(this.Host))
             {
                 //set nonExistingKey to 0, then perform the operation
-                var result = client.IncrByFloat("nonExistingKey".ToByte(), "0.25".ToByte());
-                Assert.AreEqual("0.25", result.BytesToString());
+                var result = client.Strings.IncrByFloat("nonExistingKey", 0.25);
+                Assert.AreEqual(0.25, result);
             }
         }
 
@@ -395,7 +395,7 @@ namespace UnitTest
                 tbl["name"] = "test";
                 tbl["age"] = 1;
                 client.Hashes.HMSet("mykey", tbl);
-                var result = client.IncrByFloat("mykey".ToByte(), "0.1".ToByte());
+                var result = client.Strings.IncrByFloat("mykey", 0.1);
                 Assert.IsNull(result);
             }
         }

@@ -304,7 +304,7 @@ namespace Batbeetle
             return this.ReadBulkResponse();
         }
 
-        public byte[] GetSet(byte[] key, byte[] value)
+        protected internal byte[] GetSet(byte[] key, byte[] value)
         {
             var cmd = new RedisCommand(Commands.Getset);
             cmd.ArgList.Add(key);
@@ -313,7 +313,7 @@ namespace Batbeetle
             return this.ReadBulkResponse();
         }
 
-        public int? Incr(byte[] key)
+        protected internal int? Incr(byte[] key)
         {
             var cmd = new RedisCommand(Commands.Incr);
             cmd.ArgList.Add(key);
@@ -321,7 +321,7 @@ namespace Batbeetle
             return this.ReadIntResponse();
         }
 
-        public int? IncrBy(byte[] key, byte[] increment)
+        protected internal int? IncrBy(byte[] key, byte[] increment)
         {
             var cmd = new RedisCommand(Commands.Incrby);
             cmd.ArgList.Add(key);
@@ -330,7 +330,7 @@ namespace Batbeetle
             return this.ReadIntResponse();
         }
 
-        public byte[] IncrByFloat(byte[] key, byte[] increment)
+        protected internal byte[] IncrByFloat(byte[] key, byte[] increment)
         {
             var cmd = new RedisCommand(Commands.Incrbyfloat);
             cmd.ArgList.Add(key);

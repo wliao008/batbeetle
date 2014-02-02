@@ -60,9 +60,20 @@ namespace Batbeetle
             return result;
         }
 
-        public string Get(string key)
+        /// <summary>
+        /// Get the stored value in raw bytes.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public byte[] GetRaw(string key)
         {
             var bytes = this.client.Get(Encoding.UTF8.GetBytes(key));
+            return bytes;
+        }
+
+        public string Get(string key)
+        {
+            var bytes = this.GetRaw(key);
             if (bytes == null) return null;
             return Encoding.UTF8.GetString(bytes);
         }
@@ -85,11 +96,49 @@ namespace Batbeetle
             return Encoding.UTF8.GetString(bytes);
         }
 
+        /// <summary>
+        /// Atomically sets key to value and returns the old value stored at key. Returns an error when key exists but does not hold a string value.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public string GetSet(string key, string value)
+        {
+            var bytes = this.client.GetSet(
+                Encoding.UTF8.GetBytes(key),
+                Encoding.UTF8.GetBytes(value));
+            if (bytes == null) return null;
+            return Encoding.UTF8.GetString(bytes);
+        }
+
+        public int? Incr(string key)
+        {
+            var result = this.client.Incr(Encoding.UTF8.GetBytes(key));
+            return result;
+        }
+
+        public int? IncrBy(string key, int increment)
+        {
+            var result = this.client.IncrBy(
+                Encoding.UTF8.GetBytes(key),
+                Encoding.UTF8.GetBytes(increment.ToString()));
+            return result;
+        }
+
         public bool Set(string key, string value)
         {
             var result = this.client.Set(Encoding.UTF8.GetBytes(key), Encoding.UTF8.GetBytes(value));
             if (result == null) return false;
             return result.Equals("OK");
+        }
+
+        public double? IncrByFloat(string key, double increment)
+        {
+            var result = this.client.IncrByFloat(
+                Encoding.UTF8.GetBytes(key),
+                Encoding.UTF8.GetBytes(increment.ToString()));
+            if (result == null) return null;
+            return double.Parse(result.BytesToString());
         }
 
         public bool Set(string key, string value, int expireInSec)
