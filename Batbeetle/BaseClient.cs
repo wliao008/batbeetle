@@ -221,6 +221,55 @@ namespace Batbeetle
             return this.ReadStringResponse();
         }
 
+        public byte[][] Scan()
+        {
+            throw new NotImplementedException();
+        }
+
+        public byte[][] Sort(
+            byte[] key,
+            byte[] byPattern = null,
+            byte[] offset = null,
+            byte[] count = null,
+            byte[][] getPatterns = null,
+            bool ascending = true,
+            bool alpha = false,
+            byte[] storeDestination = null)
+        {
+            var cmd = new RedisCommand(Commands.Sort);
+            cmd.ArgList.Add(key);
+            if (byPattern != null)
+            {
+                cmd.ArgList.Add("BY".ToByte());
+                cmd.ArgList.Add(byPattern);
+            }
+            if (offset != null && count != null)
+            {
+                cmd.ArgList.Add("LIMIT".ToByte());
+                cmd.ArgList.Add(offset);
+                cmd.ArgList.Add(count);
+            }
+            if (getPatterns != null)
+            {
+                foreach (var getPattern in getPatterns)
+                {
+                    cmd.ArgList.Add("GET".ToByte());
+                    cmd.ArgList.Add(getPattern);
+                }
+            }
+            if (!ascending)
+                cmd.ArgList.Add("DESC".ToByte());
+            if (alpha)
+                cmd.ArgList.Add("ALPHA".ToByte());
+            if (storeDestination != null)
+            {
+                cmd.ArgList.Add("STORE".ToByte());
+                cmd.ArgList.Add(storeDestination);
+            }
+            this.SendCommand(cmd);
+            return this.ReadMultibulkResponse();
+        }
+
         public int Ttl(byte[] key)
         {
             var cmd = new RedisCommand(Commands.Ttl);
