@@ -62,11 +62,7 @@ namespace Batbeetle
         {
             ushort crc = 0;
             foreach (var b in bytes)
-            {
-                //var crc1 = (ushort)((crc << 8) & 0xffff);
-                //var crc2 = (ushort)(((crc >> 8) ^ b) & 0xff);
                 crc = (ushort)((ushort)((crc << 8) & 0xffff) ^ XModemCRC16LookUp[((crc >> 8) ^ b) & 0xff]);
-            }
 
             return crc;
         }
