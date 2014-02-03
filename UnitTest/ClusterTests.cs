@@ -23,5 +23,15 @@ namespace UnitTest
             var result2 = cluster.KeySlot("hello".ToByte());
             Assert.AreEqual(866, result2);
         }
+
+        [TestMethod]
+        public void Dummy()
+        {
+            using (var client = new RedisClient("192.168.1.43", 7000))
+            {
+                var result = client.Strings.Set("name", "Wei Liao");
+                Assert.IsTrue(result);
+            }
+        }
     }
 }
