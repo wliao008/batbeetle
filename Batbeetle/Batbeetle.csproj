@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cluster.cs" />
     <Compile Include="Crc16.cs" />
     <Compile Include="RedisCommand.cs" />
     <Compile Include="Commands.cs" />
