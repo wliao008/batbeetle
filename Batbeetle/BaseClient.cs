@@ -267,6 +267,17 @@ namespace Batbeetle
                 cmd.ArgList.Add(storeDestination);
             }
             this.SendCommand(cmd);
+
+            if (storeDestination != null)
+            {
+                //storing the result, return the number
+                //of element as an integer
+                var result = this.ReadIntResponse();
+                var bytes = new byte[1][];
+                bytes[0] = result.ToByte();
+                return bytes;
+            }
+
             return this.ReadMultibulkResponse();
         }
 

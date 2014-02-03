@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 namespace UnitTest
 {
@@ -510,6 +511,117 @@ namespace UnitTest
                 var result = client.Restore("mykey".ToByte(), "0".ToByte(), serializedVal);
                 Assert.IsNotNull(result);
                 Assert.AreEqual("OK", result);
+            }
+        }
+
+        [TestMethod]
+        public void Sort_SimpleList_ShouldSort()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.RPush("mylist".ToByte(), "5".ToByte(), "3".ToByte());
+                var result = client.Sort("mylist".ToByte());
+                Assert.IsNotNull(result);
+                var list = result.MultiBytesToList();
+                Assert.AreEqual(2, list.Count);
+                Assert.AreEqual("3", list[0]);
+                Assert.AreEqual("5", list[1]);
+            }
+        }
+
+        [TestMethod]
+        public void Sort_SortByDesc_ShouldSortByDesc()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.RPush("mylist".ToByte(), "5".ToByte(), "3".ToByte());
+                var result = client.Sort("mylist".ToByte(), null, null, null, null, false);
+                Assert.IsNotNull(result);
+                var list = result.MultiBytesToList();
+                Assert.AreEqual(2, list.Count);
+                Assert.AreEqual("5", list[0]);
+                Assert.AreEqual("3", list[1]);
+            }
+        }
+
+        [TestMethod]
+        public void Sort_SimpleStringList_ShouldNotSortByDefault()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.RPush("mylist".ToByte(), "abc".ToByte(), "bcd".ToByte());
+                var result = client.Sort("mylist".ToByte());///TODO: should result be null here?
+                var list = result.MultiBytesToList();
+                Assert.AreEqual(0, list.Count);
+            }
+        }
+
+        [TestMethod]
+        public void Sort_SimpleStringListAlpha_ShouldSort()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.RPush("mylist".ToByte(), "abc".ToByte(), "bcd".ToByte());
+                var result = client.Sort("mylist".ToByte(), null, null, null, null, true, true);
+                Assert.IsNotNull(result);
+                var list = result.MultiBytesToList();
+                Assert.AreEqual(2, list.Count);
+                Assert.AreEqual("abc", list[0]);
+                Assert.AreEqual("bcd", list[1]);
+            }
+        }
+
+        [TestMethod]
+        public void Sort_SimpleStringListAlphaDesc_ShouldSortByDesc()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                client.RPush("mylist".ToByte(), "abc".ToByte(), "bcd".ToByte());
+                var result = client.Sort("mylist".ToByte(), null, null, null, null, false, true);
+                Assert.IsNotNull(result);
+                var list = result.MultiBytesToList();
+                Assert.AreEqual(2, list.Count);
+                Assert.AreEqual("bcd", list[0]);
+                Assert.AreEqual("abc", list[1]);
+            }
+        }
+
+        [TestMethod]
+        public void Sort_Limit_ShouldSortAndReturnLimitElements()
+        {
+            Random rand = new Random((int)DateTime.Now.Ticks);
+            using (var client = new RedisClient(this.Host))
+            {
+                for (int i = 0; i < 100; ++i)
+                    client.RPush("mylist".ToByte(), rand.Next(1, 100).ToByte());
+                var result = client.Sort("mylist".ToByte(), null, "0".ToByte(), "10".ToByte());
+                Assert.IsNotNull(result);
+                var list = result.MultiBytesToList();
+                Assert.AreEqual(10, list.Count);
+            }
+        }
+
+        [TestMethod]
+        public void Sort_LimitStore_ShouldSortAndStoreReturnLimitElements()
+        {
+            Random rand = new Random((int)DateTime.Now.Ticks);
+            using (var client = new RedisClient(this.Host))
+            {
+                for (int i = 0; i < 100; ++i)
+                    client.RPush("mylist".ToByte(), rand.Next(1, 100).ToByte());
+                var result = client.Sort(
+                    "mylist".ToByte(),
+                    null,
+                    "0".ToByte(),
+                    "10".ToByte(),
+                    null,
+                    true,
+                    false,
+                    "newkey".ToByte());
+                Assert.IsNotNull(result);
+                var list = result.MultiBytesToList();
+                Assert.AreEqual(1, list.Count);
+                Assert.AreEqual("10", list[0]);
             }
         }
 
