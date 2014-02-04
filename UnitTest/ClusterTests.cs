@@ -38,8 +38,17 @@ namespace UnitTest
         public void ClusterNodes()
         {
             var cluster = new Cluster();
-            var result = cluster.RefreshNodes();
+            Cluster.NodeChanged += (s, e) =>
+            {
+                System.Diagnostics.Debug.WriteLine("FAILED NODE");
+                System.Diagnostics.Debug.WriteLine(e.Node.ToString());
+            };
+            var client = cluster.GetClientFromKey("myname".ToByte());
+            client.Strings.Set("myname", "test");
+            var result = client.Strings.Get("myname");
+            //Assert.IsTrue(result);
             Assert.IsNotNull(result);
+            Assert.AreEqual("test", result);
         }
     }
 }

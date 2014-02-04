@@ -1,25 +1,67 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace Batbeetle
 {
     public class Cluster
     {
+        public delegate void EventHandler(object sender, ClusterEventArgs e);
+
         private readonly ushort RedisClusterHashSlot = 16384;
         private readonly ushort RedisClusterRequestTtl = 16;
         private readonly ushort RedisClusterDefaultTimeout = 1;
+        public static List<Node> Nodes { get; set; }
+        public static event EventHandler NodeChanged;
+        private static Timer timer;
+
+        static Cluster()
+        {
+            RefreshNodes();
+            var bg = new BackgroundWorker();
+            bg.DoWork += (s, e) =>
+            {
+                timer = new Timer(1000);
+                timer.Elapsed += (s1, e1) =>
+                {
+                    Cluster.RefreshNodes();
+                    var failed = Cluster.Nodes.Where(x => x.IsFailed).ToList();
+                    foreach (var n in failed)
+                    {
+                        if (NodeChanged != null)
+                            NodeChanged(null, new ClusterEventArgs(n));
+                    }
+                };
+                timer.Enabled = true;
+            };
+            bg.RunWorkerAsync();
+        }
 
         public ushort KeySlot(byte[] key)
         {
             return (ushort)(Crc16.GetCrc16(key) % RedisClusterHashSlot);
         }
 
-        public List<Node> RefreshNodes()
+        public Node GetNodeFromKey(byte[] key)
         {
-            var nodes = new List<Node>();
+            var ks = this.KeySlot(key);
+            var node = Nodes.FirstOrDefault(x => x.IsMaster && x.SlotFrom <= ks && x.SlotTo >= ks);
+            return node;
+        }
+
+        public RedisClient GetClientFromKey(byte[] key)
+        {
+            var node = this.GetNodeFromKey(key);
+            return node.RedisClient;
+        }
+
+        public static void RefreshNodes()
+        {
+            Nodes = new List<Node>();
             using (var client = new RedisClient("192.168.1.43", 7000))
             {
                 var result = client.ClusterNodes();
@@ -43,24 +85,32 @@ namespace Batbeetle
                             Status = data[7],
                         };
 
-                        if (node.IsMaster)
+                        if (node.IsMaster && !node.IsFailed)
                         {
                             var slots = data[8].Split('-');
-                            node.SlotFrom = int.Parse(slots[0]);
-                            node.SlotTo = int.Parse(slots[1]);
+                            node.SlotFrom = ushort.Parse(slots[0]);
+                            node.SlotTo = ushort.Parse(slots[1]);
                         }
 
-                        nodes.Add(node);
+                        node.RedisClient = new RedisClient(node.Host, node.Port);
+                        Nodes.Add(node);
                     }
                 }
             }
+        }
 
-            return nodes;
+        /// <summary>
+        /// Flush the mapping to force redirection when debugging.
+        /// </summary>
+        public static void FlushNodes()
+        {
+            Nodes = new List<Node>();
         }
     }
 
     public class Node
     {
+        public RedisClient RedisClient { get; set; }
         public string NodeId { get; set; }
         public string Host { get; set; }
         public int Port { get; set; }
@@ -70,8 +120,8 @@ namespace Batbeetle
         public Int64 LastPong { get; set; }
         public int Epoch { get; set; }
         public string Status { get; set; }
-        public int SlotFrom { get; set; }
-        public int SlotTo { get; set; }
+        public ushort SlotFrom { get; set; }
+        public ushort SlotTo { get; set; }
 
         public bool IsMaster
         {
@@ -82,6 +132,7 @@ namespace Batbeetle
                 return false;
             }
         }
+
         public bool IsFailed
         {
             get
@@ -90,6 +141,11 @@ namespace Batbeetle
                     return this.Flags.Contains("fail");
                 return false;
             }
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0} - {1}:{2} [{3}-{4}]", this.Flags, this.Host, this.Port, this.SlotFrom, this.SlotTo);
         }
     }
 
@@ -140,6 +196,16 @@ namespace Batbeetle
                 crc = (ushort)((ushort)((crc << 8) & 0xffff) ^ XModemCRC16LookUp[((crc >> 8) ^ b) & 0xff]);
 
             return crc;
+        }
+    }
+
+    public class ClusterEventArgs : EventArgs
+    {
+        public Node Node { get; set; }
+
+        public ClusterEventArgs(Node node)
+        {
+            this.Node = node;
         }
     }
 }
