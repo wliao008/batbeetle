@@ -33,5 +33,13 @@ namespace UnitTest
                 Assert.IsTrue(result);
             }
         }
+
+        [TestMethod]
+        public void ClusterNodes()
+        {
+            var cluster = new Cluster();
+            var result = cluster.RefreshNodes();
+            Assert.IsNotNull(result);
+        }
     }
 }

@@ -1265,6 +1265,16 @@ namespace Batbeetle
         }
         #endregion
 
+        #region Cluster
+        public byte[] ClusterNodes()
+        {
+            var cmd = new RedisCommand(Commands.Cluster);
+            cmd.ArgList.Add(Commands.Nodes);
+            this.SendCommand(cmd);
+            return this.ReadBulkResponse();
+        }
+        #endregion
+
         #region Send
         protected internal void SendCommand(RedisCommand cmd)
         {

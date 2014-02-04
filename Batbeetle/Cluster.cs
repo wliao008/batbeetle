@@ -16,6 +16,81 @@ namespace Batbeetle
         {
             return (ushort)(Crc16.GetCrc16(key) % RedisClusterHashSlot);
         }
+
+        public List<Node> RefreshNodes()
+        {
+            var nodes = new List<Node>();
+            using (var client = new RedisClient("192.168.1.43", 7000))
+            {
+                var result = client.ClusterNodes();
+                if (result != null)
+                {
+                    var lines = result.BytesToString().Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var line in lines)
+                    {
+                        var data = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        var ipport = data[1].Split(':');
+                        var node = new Node
+                        {
+                            NodeId = data[0],
+                            Host = ipport[0],
+                            Port = int.Parse(ipport[1]),
+                            Flags = data[2],
+                            ParentNodeId = data[3],
+                            LastPing = Int64.Parse(data[4]),
+                            LastPong = Int64.Parse(data[5]),
+                            Epoch = int.Parse(data[6]),
+                            Status = data[7],
+                        };
+
+                        if (node.IsMaster)
+                        {
+                            var slots = data[8].Split('-');
+                            node.SlotFrom = int.Parse(slots[0]);
+                            node.SlotTo = int.Parse(slots[1]);
+                        }
+
+                        nodes.Add(node);
+                    }
+                }
+            }
+
+            return nodes;
+        }
+    }
+
+    public class Node
+    {
+        public string NodeId { get; set; }
+        public string Host { get; set; }
+        public int Port { get; set; }
+        public string Flags { get; set; }
+        public string ParentNodeId { get; set; }
+        public Int64 LastPing { get; set; }
+        public Int64 LastPong { get; set; }
+        public int Epoch { get; set; }
+        public string Status { get; set; }
+        public int SlotFrom { get; set; }
+        public int SlotTo { get; set; }
+
+        public bool IsMaster
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(this.Flags))
+                    return this.Flags.Contains("master");
+                return false;
+            }
+        }
+        public bool IsFailed
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(this.Flags))
+                    return this.Flags.Contains("fail");
+                return false;
+            }
+        }
     }
 
     /// <summary>
