@@ -137,6 +137,24 @@ namespace UnitTest
         }
 
         [TestMethod]
+        public void HGetAll_KeyExistWithEmptyField_ShouldReturnAllValues()
+        {
+            using (var client = new RedisClient(this.Host))
+            {
+                Hashtable tbl = new Hashtable();
+                tbl["name"] = " ";
+                tbl["age"] = 20;
+                tbl["email"] = "test@ttest.com";
+                client.Hashes.HMSet("mykey", tbl);
+
+                var result = client.Hashes.HMGetAll("mykey");
+                Assert.AreEqual(" ", result["name"]);
+                Assert.AreEqual("20", result["age"]);
+                Assert.AreEqual("test@ttest.com", result["email"]);
+            }
+        }
+
+        [TestMethod]
         public void HGetAll_KeyNotExist_ShouldReturnEmpty()
         {
             using (var client = new RedisClient(this.Host))
