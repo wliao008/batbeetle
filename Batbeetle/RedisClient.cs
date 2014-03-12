@@ -202,10 +202,10 @@ namespace Batbeetle
         {
             var data = this.client.HMGetAll(key.ToByte());
             var str = data.MultiBytesToString();
-            var sc = str.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var sc = str.Split(new char[] { '\r', '\n' });
             Hashtable tbl = new Hashtable();
-            for (int i = 0; i < sc.Length; i += 2)
-                tbl[sc[i]] = sc[i + 1];
+            for (int i = 0; i < sc.Length - 1; i += 4)
+                tbl[sc[i]] = sc[i + 2];
             return tbl;
         }
     }

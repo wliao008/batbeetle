@@ -8,6 +8,7 @@ namespace UnitTest
     public class ClusterTests
     {
         [TestMethod]
+        [TestCategory("Cluster")]
         public void GetCrc16_ShouldReturnUshort()
         {
             var result = Crc16.GetCrc16("foo1".ToByte());
@@ -15,6 +16,7 @@ namespace UnitTest
         }
 
         [TestMethod]
+        [TestCategory("Cluster")]
         public void KeySlot_GivenAKey_ReturnReturnSlot()
         {
             var cluster = new Cluster();
@@ -25,6 +27,7 @@ namespace UnitTest
         }
 
         [TestMethod]
+        [TestCategory("Cluster")]
         public void Dummy()
         {
             using (var client = new RedisClient("192.168.1.43", 7000))
